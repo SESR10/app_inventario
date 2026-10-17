@@ -42,7 +42,7 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 2 terminada (productos y etiquetas). Siguiente: fase 3, importar y exportar Excel.
+- Fase actual: 3 terminada (importar y exportar Excel). Siguiente: fase 4, movimientos, alertas, panel y roles.
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
@@ -53,5 +53,13 @@ grandes, facilidad de uso y apariencia profesional.
   índices; <10 ms con 100.000 productos) y bucket privado `product-images` con RLS por carpeta
   de empresa. Lista virtualizada con filtros, formulario con catálogos creables en línea,
   imagen, confirmación al eliminar, y etiquetas Code128/QR imprimibles (hasta 200 productos).
-- Pendiente: el stock se edita directo en el formulario; en la fase 4 pasará a movimientos.
-  Importar en lotes de 500 filas o menos (el contador de SKU se vuelve lento con lotes enormes).
+- Fase 3: migración `20261018000000_importar_exportar.sql` con `import_products` (lote de hasta 500
+  filas por transacción, crea categorías/ubicaciones/proveedores por nombre, actualiza u omite SKU
+  existentes), `existing_skus` y `export_products` (páginas de 1000). Las dos primeras son security
+  definer con chequeo de rol: con RLS, `lower(sku)` no usa el índice. Pantalla `/importar`: leer
+  .xlsx/.xls/.csv (UTF-8 o Windows-1252, coma o punto y coma), mapeo automático de columnas,
+  revisión con errores por fila y descarga de errores, importación por lotes con progreso y
+  reintento, exportación a Excel y plantilla con instrucciones. SheetJS 0.20.3 vía el paquete npm
+  `@e965/xlsx` (el CDN oficial de SheetJS no es accesible desde el entorno de desarrollo).
+- Pendiente: el stock se edita directo en el formulario y en la importación; en la fase 4 pasará a
+  movimientos con historial.

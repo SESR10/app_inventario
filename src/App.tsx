@@ -7,6 +7,7 @@ import { CompanyProvider } from './company/CompanyProvider'
 import { useCompany } from './company/context'
 import { Layout } from './components/Layout'
 import { Alert } from './components/ui/Alert'
+import { ImportExportPage } from './importExport/ImportExportPage'
 import { SupabaseContext } from './lib/client-context'
 import { CreateCompanyPage } from './pages/CreateCompanyPage'
 import { DashboardPage } from './pages/DashboardPage'
@@ -55,7 +56,7 @@ function CompanyGate() {
         <Route path="productos/:id" element={<EditProductRoute />} />
         <Route path="etiquetas" element={<LabelsPage />} />
         <Route path="movimientos" element={<PendingPage titleKey="nav.movements" />} />
-        <Route path="importar" element={<PendingPage titleKey="nav.import" />} />
+        <Route path="importar" element={<ImportExportPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>
