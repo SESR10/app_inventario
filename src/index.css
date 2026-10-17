@@ -1,0 +1,39 @@
+@import 'tailwindcss';
+
+/* Paleta con contraste mínimo 4.5:1 sobre blanco (WCAG 2.2 AA). */
+@theme {
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-50: #eff6ff;
+  --color-ink: #0f172a;
+  --color-muted: #475569;
+  --color-line: #cbd5e1;
+  --color-danger: #b91c1c;
+  --color-success: #15803d;
+  --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+@layer base {
+  html {
+    color: var(--color-ink);
+    background: #f8fafc;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Foco siempre visible al navegar con teclado. */
+  :focus-visible {
+    outline: 3px solid var(--color-brand-700);
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}

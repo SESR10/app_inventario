@@ -42,4 +42,9 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 0 (sin iniciar)
+- Fase actual: 1 terminada (base). Siguiente: fase 2, productos y etiquetas.
+- Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
+  categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
+  claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
+  login y registro, creación de empresa, selector de empresa, layout accesible
+  mobile-first, i18n con textos en `src/i18n/es.ts`; pruebas con Vitest + axe.
