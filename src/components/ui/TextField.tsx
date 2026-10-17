@@ -18,7 +18,7 @@ export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
   const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined
 
   return (
-    <div className={`flex flex-col gap-1 ${className}`}>
+    <div className={`flex min-w-0 flex-col gap-1 ${className}`}>
       <label htmlFor={inputId} className="font-medium">
         {label}
         {rest.required && <span aria-hidden="true"> *</span>}
@@ -33,7 +33,7 @@ export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
         id={inputId}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-11 rounded-md border bg-white px-3 text-base ${error ? 'border-danger' : 'border-slate-500'}`}
+        className={`min-h-11 w-full min-w-0 rounded-md border bg-white px-3 text-base ${error ? 'border-danger' : 'border-slate-500'}`}
         {...rest}
       />
       {error && (
