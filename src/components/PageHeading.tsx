@@ -13,7 +13,7 @@ export function PageHeading({ children, title }: { children: ReactNode; title: s
   }, [title, t])
 
   return (
-    <h1 ref={ref} tabIndex={-1} className="text-2xl font-bold sm:text-3xl">
+    <h1 ref={ref} tabIndex={-1} className="text-2xl font-bold focus:outline-none sm:text-3xl">
       {children}
     </h1>
   )

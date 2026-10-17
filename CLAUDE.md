@@ -42,9 +42,16 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 1 terminada (base). Siguiente: fase 2, productos y etiquetas.
+- Fase actual: 2 terminada (productos y etiquetas). Siguiente: fase 3, importar y exportar Excel.
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
   login y registro, creación de empresa, selector de empresa, layout accesible
   mobile-first, i18n con textos en `src/i18n/es.ts`; pruebas con Vitest + axe.
+- Fase 2: migración `20261017000000_productos.sql` con SKU automático por empresa (P-000001…),
+  búsqueda paginada por cursor (`search_products`, `count_products`, SQL dinámico para usar
+  índices; <10 ms con 100.000 productos) y bucket privado `product-images` con RLS por carpeta
+  de empresa. Lista virtualizada con filtros, formulario con catálogos creables en línea,
+  imagen, confirmación al eliminar, y etiquetas Code128/QR imprimibles (hasta 200 productos).
+- Pendiente: el stock se edita directo en el formulario; en la fase 4 pasará a movimientos.
+  Importar en lotes de 500 filas o menos (el contador de SKU se vuelve lento con lotes enormes).

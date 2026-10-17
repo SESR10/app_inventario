@@ -32,4 +32,5 @@ App web de inventario multiempresa. La especificación completa está en [CLAUDE
 - `src/components`: diseño general y componentes accesibles (`ui/`)
 - `src/pages`: pantallas
 - `src/i18n`: textos de la interfaz (español por defecto)
+- `src/products`: lista, formulario y etiquetas de productos
 - `supabase/migrations`: esquema, índices y reglas de acceso (RLS)

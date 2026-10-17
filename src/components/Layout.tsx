@@ -29,7 +29,7 @@ export function Layout() {
         {t('app.skipToContent')}
       </a>
 
-      <header className="border-b border-line bg-white">
+      <header className="border-b border-line bg-white print:hidden">
         <div className="mx-auto flex max-w-7xl flex-wrap items-center gap-3 px-4 py-3">
           <span className="text-lg font-bold">{t('app.name')}</span>
 
@@ -76,7 +76,7 @@ export function Layout() {
         <nav
           id={navId}
           aria-label={t('nav.label')}
-          className={`${menuOpen ? 'block' : 'hidden'} border-b border-line bg-white md:block md:w-56 md:shrink-0 md:border-r md:border-b-0 md:bg-transparent`}
+          className={`${menuOpen ? 'block' : 'hidden'} print:hidden border-b border-line bg-white md:block md:w-56 md:shrink-0 md:border-r md:border-b-0 md:bg-transparent`}
         >
           <ul className="flex flex-col p-2">
             {links.map((link) => (
@@ -96,7 +96,7 @@ export function Layout() {
           </ul>
         </nav>
 
-        <main id="contenido" tabIndex={-1} className="flex-1 px-4 py-6">
+        <main id="contenido" tabIndex={-1} className="flex-1 px-4 py-6 print:p-0">
           <Outlet />
         </main>
       </div>

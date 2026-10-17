@@ -1,6 +1,6 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
 import { useTranslation } from 'react-i18next'
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider'
 import { useAuth } from './auth/context'
 import { CompanyProvider } from './company/CompanyProvider'
@@ -12,6 +12,9 @@ import { CreateCompanyPage } from './pages/CreateCompanyPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
 import { NotFoundPage, PendingPage } from './pages/SimplePages'
+import { LabelsPage } from './products/LabelsPage'
+import { ProductFormPage } from './products/ProductFormPage'
+import { ProductsPage } from './products/ProductsPage'
 
 function FullScreenMessage({ children }: { children: React.ReactNode }) {
   return <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 px-4">{children}</main>
@@ -24,6 +27,12 @@ function Loading() {
       <p role="status">{t('app.loading')}</p>
     </FullScreenMessage>
   )
+}
+
+// Reinicia el formulario al pasar de un producto a otro.
+function EditProductRoute() {
+  const { id } = useParams()
+  return <ProductFormPage key={id} />
 }
 
 function CompanyGate() {
@@ -41,7 +50,10 @@ function CompanyGate() {
     <Routes>
       <Route element={<Layout />}>
         <Route index element={<DashboardPage />} />
-        <Route path="productos" element={<PendingPage titleKey="nav.products" />} />
+        <Route path="productos" element={<ProductsPage />} />
+        <Route path="productos/nuevo" element={<ProductFormPage />} />
+        <Route path="productos/:id" element={<EditProductRoute />} />
+        <Route path="etiquetas" element={<LabelsPage />} />
         <Route path="movimientos" element={<PendingPage titleKey="nav.movements" />} />
         <Route path="importar" element={<PendingPage titleKey="nav.import" />} />
         <Route path="*" element={<NotFoundPage />} />
