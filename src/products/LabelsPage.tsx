@@ -48,7 +48,7 @@ export function LabelsPage() {
         {error && <Alert tone="error">{t('products.loadError')}</Alert>}
         {!loading && products.length === 0 && !error && <Alert>{t('labels.none')}</Alert>}
 
-        <div className="grid gap-3 rounded-lg border border-line bg-white p-4 sm:grid-cols-3 sm:items-end">
+        <div className="grid gap-3 rounded-xl border border-line bg-white shadow-sm p-4 sm:grid-cols-3 sm:items-end">
           <SelectField label={t('labels.type')} value={codeType} onChange={(e) => setCodeType(e.target.value as CodeType)}>
             <option value="barcode">{t('labels.typeBarcode')}</option>
             <option value="qr">{t('labels.typeQr')}</option>

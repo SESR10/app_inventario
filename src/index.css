@@ -1,22 +1,32 @@
 @import 'tailwindcss';
 
-/* Paleta con contraste mínimo 4.5:1 sobre blanco (WCAG 2.2 AA). */
+/* Paleta "bodega": índigo profundo con acento ámbar (cajas, etiquetas).
+   Textos con contraste mínimo 4.5:1 sobre blanco y sobre el fondo (WCAG 2.2 AA). */
 @theme {
-  --color-brand-700: #1d4ed8;
-  --color-brand-800: #1e40af;
-  --color-brand-50: #eff6ff;
-  --color-ink: #0f172a;
-  --color-muted: #475569;
-  --color-line: #cbd5e1;
+  --color-brand-50: #eef2ff;
+  --color-brand-100: #e0e7ff;
+  --color-brand-200: #c7d2fe;
+  --color-brand-600: #4f46e5;
+  --color-brand-700: #4338ca;
+  --color-brand-800: #3730a3;
+  --color-brand-900: #312e81;
+  --color-brand-950: #1e1b4b;
+  --color-accent-200: #fde68a;
+  --color-accent-300: #fcd34d;
+  --color-accent-400: #fbbf24;
+  --color-canvas: #f4f5fb;
+  --color-ink: #111827;
+  --color-muted: #4b5563;
+  --color-line: #dfe2ee;
   --color-danger: #b91c1c;
   --color-success: #15803d;
-  --font-sans: system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-sans: 'Plus Jakarta Sans Variable', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 @layer base {
   html {
     color: var(--color-ink);
-    background: #f8fafc;
+    background: var(--color-canvas);
     -webkit-text-size-adjust: 100%;
   }
 

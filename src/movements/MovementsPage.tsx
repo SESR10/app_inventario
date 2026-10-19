@@ -87,7 +87,7 @@ export function MovementsPage() {
         </p>
       )}
 
-      <search className="rounded-lg border border-line bg-white p-4">
+      <search className="rounded-xl border border-line bg-white shadow-sm p-4">
         <fieldset className="grid gap-3 sm:grid-cols-3">
           <legend className="sr-only">{t('movements.filters')}</legend>
           <SelectField

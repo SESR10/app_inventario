@@ -42,7 +42,7 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 4 terminada (movimientos, alertas, panel y roles). Las 4 fases del plan están completas.
+- Fase actual: 5 terminada (nueva interfaz). Las fases 1 a 4 del plan original están completas.
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
@@ -71,3 +71,7 @@ grandes, facilidad de uso y apariencia profesional.
   registrar movimiento (búsqueda por nombre/SKU, escáner + Enter), historial con filtros, panel
   con resumen y productos para reponer, equipo. El stock ya no se edita en la ficha del producto
   (solo el inicial al crearlo). Etiquetas e importación se cargan bajo demanda (lazy).
+- Fase 5: identidad visual "bodega": logo de caja (`src/components/Logo.tsx`, favicon), paleta índigo + acento
+  ámbar en `src/index.css`, fuente Plus Jakarta Sans (@fontsource, sin CDN) e íconos lucide-react. Menú lateral
+  oscuro en escritorio y menú fijo abajo en celular (un solo `<nav>`; nada de `backdrop-filter` en el header,
+  rompe el `fixed`). Panel con encabezado de bienvenida y tarjetas con ícono; ingreso con presentación de la app.

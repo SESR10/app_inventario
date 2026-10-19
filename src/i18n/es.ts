@@ -11,8 +11,6 @@ const es = {
   },
   nav: {
     label: 'Menú principal',
-    open: 'Abrir menú',
-    close: 'Cerrar menú',
     dashboard: 'Panel',
     products: 'Productos',
     movements: 'Movimientos',
@@ -21,9 +19,26 @@ const es = {
     signOut: 'Cerrar sesión',
     company: 'Empresa',
   },
+  // Nombres cortos para el menú inferior del celular.
+  navShort: {
+    dashboard: 'Panel',
+    products: 'Productos',
+    movements: 'Movimientos',
+    import: 'Excel',
+    team: 'Equipo',
+  },
   auth: {
     signInTitle: 'Ingresar',
     signUpTitle: 'Crear cuenta',
+    signInIntro: 'Qué bueno verte. Ingresa para ver tu inventario.',
+    signUpIntro: 'Crea tu cuenta gratis y organiza tu inventario en minutos.',
+    tagline: 'Tu inventario claro, ordenado y siempre al día.',
+    features: {
+      labels: 'Etiquetas con código de barras y QR',
+      excel: 'Importa y exporta con Excel',
+      alerts: 'Alertas cuando un producto se agota',
+    },
+    footer: 'Para negocios de cualquier tamaño, desde la tienda del barrio hasta la gran bodega.',
     email: 'Correo electrónico',
     password: 'Contraseña',
     passwordHint: 'Mínimo 8 caracteres.',
@@ -50,7 +65,9 @@ const es = {
   },
   dashboard: {
     title: 'Panel',
+    greeting: '¡Hola de nuevo!',
     welcome: 'Resumen de {{company}}',
+    heroText: 'Así va tu inventario hoy. Registra entradas y salidas para mantenerlo al día.',
     loadError: 'No pudimos cargar el resumen. Intenta de nuevo.',
     statsLabel: 'Resumen del inventario',
     products: 'Productos',

@@ -33,7 +33,7 @@ export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
         id={inputId}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-11 w-full min-w-0 rounded-md border bg-white px-3 text-base ${error ? 'border-danger' : 'border-slate-500'}`}
+        className={`min-h-11 w-full min-w-0 rounded-lg border bg-white transition-colors hover:border-brand-700 px-3 text-base ${error ? 'border-danger' : 'border-slate-500'}`}
         {...rest}
       />
       {error && (

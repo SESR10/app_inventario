@@ -12,10 +12,12 @@
     "typecheck": "tsc -b"
   },
   "dependencies": {
+    "@fontsource-variable/plus-jakarta-sans": "^5.2.8",
     "@supabase/supabase-js": "^2.118.0",
     "@tanstack/react-virtual": "^3.14.21",
     "i18next": "^26.4.7",
     "jsbarcode": "^3.12.3",
+    "lucide-react": "^0.545.0",
     "qrcode": "^1.5.4",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",

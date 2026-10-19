@@ -25,7 +25,7 @@ export function ImportExportPage() {
         <ExportCard />
         <TemplateCard />
       </div>
-      <section aria-labelledby="importar-titulo" className="flex flex-col gap-4 rounded-lg border border-line bg-white p-4 sm:p-6">
+      <section aria-labelledby="importar-titulo" className="flex flex-col gap-4 rounded-xl border border-line bg-white shadow-sm p-4 sm:p-6">
         <h2 id="importar-titulo" className="text-xl font-semibold">
           {t('importExport.importTitle')}
         </h2>
@@ -37,7 +37,7 @@ export function ImportExportPage() {
 
 function Card({ id, title, body, children }: { id: string; title: string; body: string; children: React.ReactNode }) {
   return (
-    <section aria-labelledby={id} className="flex flex-col gap-3 rounded-lg border border-line bg-white p-4 sm:p-6">
+    <section aria-labelledby={id} className="flex flex-col gap-3 rounded-xl border border-line bg-white shadow-sm p-4 sm:p-6">
       <h2 id={id} className="text-xl font-semibold">
         {title}
       </h2>
