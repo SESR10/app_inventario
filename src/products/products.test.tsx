@@ -87,6 +87,7 @@ describe('Formulario de producto', () => {
     expect(screen.getByLabelText(/Precio de venta/)).toHaveAttribute('aria-invalid', 'true')
     expect((await axe(container)).violations).toEqual([])
 
+    expect(screen.getByLabelText('Stock inicial')).toHaveValue('0')
     await userEvent.type(name, 'Taladro')
     await userEvent.clear(screen.getByLabelText(/Precio de venta/))
     await userEvent.type(screen.getByLabelText(/Precio de venta/), '1.250,50')
@@ -115,6 +116,21 @@ describe('Formulario de producto', () => {
     expect(await screen.findByText('Producto "Martillo" eliminado.')).toBeInTheDocument()
     expect(client.writes[0]).toMatchObject({ table: 'products', op: 'delete', filters: [['id', 'p1']] })
     expect(client.storageBucket.remove).toHaveBeenCalledWith(['c1/foto.png'])
+  })
+
+  it('al editar, el stock no se cambia en el formulario sino con movimientos', async () => {
+    const { client } = setup('/productos/p1')
+    expect(await screen.findByRole('heading', { name: 'Martillo' })).toBeInTheDocument()
+    expect(screen.queryByLabelText(/Stock actual|Stock inicial/)).not.toBeInTheDocument()
+    expect(screen.getByRole('link', { name: 'Registrar entrada, salida o ajuste' })).toHaveAttribute(
+      'href',
+      '/movimientos/nuevo?producto=p1',
+    )
+    expect(screen.getByRole('link', { name: 'Ver historial' })).toHaveAttribute('href', '/movimientos?producto=p1')
+    await userEvent.click(screen.getByRole('button', { name: 'Guardar producto' }))
+    await screen.findByText(/guardado con SKU/)
+    expect(client.writes[0]).toMatchObject({ table: 'products', op: 'update' })
+    expect(client.writes[0].payload).not.toHaveProperty('stock')
   })
 
   it('muestra el producto sin edición para solo lectura', async () => {

@@ -71,7 +71,12 @@ export function fakeClient({ signedIn = false, memberships = [], tables = {}, rp
     from: vi.fn(query),
     rpc: vi.fn((name: string, args: Record<string, unknown> = {}) => {
       const handler = rpc[name] ?? (name === 'create_company' ? () => 'c1' : () => null)
-      return Promise.resolve({ data: handler(args), error: null })
+      // Un handler que lanza un objeto simula un error de la base (por ejemplo { hint: 'last_admin' }).
+      try {
+        return Promise.resolve({ data: handler(args), error: null })
+      } catch (error) {
+        return Promise.resolve({ data: null, error })
+      }
     }),
     storage: { from: vi.fn(() => storageBucket) },
     writes,

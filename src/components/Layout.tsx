@@ -1,4 +1,4 @@
-import { useId, useState } from 'react'
+import { Suspense, useId, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../auth/context'
@@ -10,6 +10,7 @@ const links = [
   { to: '/productos', key: 'nav.products' },
   { to: '/movimientos', key: 'nav.movements' },
   { to: '/importar', key: 'nav.import' },
+  { to: '/equipo', key: 'nav.team' },
 ] as const
 
 export function Layout() {
@@ -97,7 +98,9 @@ export function Layout() {
         </nav>
 
         <main id="contenido" tabIndex={-1} className="flex-1 px-4 py-6 print:p-0">
-          <Outlet />
+          <Suspense fallback={<p role="status">{t('app.loading')}</p>}>
+            <Outlet />
+          </Suspense>
         </main>
       </div>
     </div>

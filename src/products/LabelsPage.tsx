@@ -9,10 +9,9 @@ import { SelectField } from '../components/ui/SelectField'
 import { useSupabase } from '../lib/client-context'
 import { formatMoney } from '../lib/format'
 import type { Product } from '../lib/types'
-import { getProductsByIds } from './api'
+import { getProductsByIds, MAX_LABELS } from './api'
 import { Barcode, QrCode } from './codes'
 
-export const MAX_LABELS = 200
 
 type CodeType = 'barcode' | 'qr' | 'both'
 type LabelProduct = Pick<Product, 'id' | 'sku' | 'name' | 'price' | 'unit'>

@@ -42,7 +42,7 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 3 terminada (importar y exportar Excel). Siguiente: fase 4, movimientos, alertas, panel y roles.
+- Fase actual: 4 terminada (movimientos, alertas, panel y roles). Las 4 fases del plan están completas.
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
@@ -61,5 +61,13 @@ grandes, facilidad de uso y apariencia profesional.
   revisión con errores por fila y descarga de errores, importación por lotes con progreso y
   reintento, exportación a Excel y plantilla con instrucciones. SheetJS 0.20.3 vía el paquete npm
   `@e965/xlsx` (el CDN oficial de SheetJS no es accesible desde el entorno de desarrollo).
-- Pendiente: el stock se edita directo en el formulario y en la importación; en la fase 4 pasará a
-  movimientos con historial.
+- Fase 4: migración `20261019000000_operacion.sql`. Todo cambio de stock queda en `stock_movements`
+  por un trigger en products (tipo y motivo vía `set_config('app.movement_*', ..., true)`; motivos
+  `@initial`, `@import`, `@edit` se traducen en la interfaz). `record_movement` (entrada, salida,
+  ajuste por conteo; no deja stock negativo), `list_movements` (cursor por id, con correo de quien
+  lo hizo), `dashboard_summary`, equipo con `company_people`, `invite_member` (agrega si la cuenta
+  existe y tiene el correo confirmado; si no, deja invitación en `company_invitations`),
+  `claim_invitations` al ingresar y trigger que impide quedarse sin administrador. Pantallas:
+  registrar movimiento (búsqueda por nombre/SKU, escáner + Enter), historial con filtros, panel
+  con resumen y productos para reponer, equipo. El stock ya no se edita en la ficha del producto
+  (solo el inicial al crearlo). Etiquetas e importación se cargan bajo demanda (lazy).
