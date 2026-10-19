@@ -43,9 +43,13 @@ export function CompanyProvider({
     setLoading(false)
   }, [])
 
+  // Primero acepta las invitaciones pendientes a su correo; así entra directo a esas empresas.
   useEffect(() => {
-    void fetchMemberships().then(apply)
-  }, [fetchMemberships, apply])
+    void Promise.resolve(client.rpc('claim_invitations'))
+      .catch(() => undefined)
+      .then(fetchMemberships)
+      .then(apply)
+  }, [client, fetchMemberships, apply])
 
   const reload = useCallback(async () => {
     setLoading(true)

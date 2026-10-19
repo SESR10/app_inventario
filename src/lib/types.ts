@@ -43,6 +43,37 @@ export interface Product {
   image_path: string | null
 }
 
-export type ProductInput = Omit<Product, 'id' | 'company_id' | 'sku'> & { sku: string | null }
+// Al editar no se envía el stock: cambia solo con movimientos.
+export type ProductInput = Omit<Product, 'id' | 'company_id' | 'sku' | 'stock'> & { sku: string | null; stock?: number }
 
 export const isLowStock = (p: { stock: number; min_stock: number }) => p.min_stock > 0 && p.stock <= p.min_stock
+
+export type MovementType = 'in' | 'out' | 'adjust'
+
+// Fila del historial (función list_movements).
+export interface Movement {
+  id: number
+  created_at: string
+  type: MovementType
+  quantity: number
+  stock_after: number
+  reason: string | null
+  product_id: string
+  product_name: string
+  product_sku: string
+  unit: string
+  user_email: string | null
+}
+
+export interface TeamMember {
+  user_id: string
+  email: string
+  role: AppRole
+  created_at: string
+}
+
+export interface Invitation {
+  email: string
+  role: AppRole
+  created_at: string
+}

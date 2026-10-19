@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { useNavigate, useParams } from 'react-router-dom'
+import { Link, useNavigate, useParams } from 'react-router-dom'
 import { useCompany } from '../company/context'
 import { PageHeading } from '../components/PageHeading'
 import { Alert } from '../components/ui/Alert'
@@ -8,7 +8,7 @@ import { Button, LinkButton } from '../components/ui/Button'
 import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { TextField } from '../components/ui/TextField'
 import { useSupabase } from '../lib/client-context'
-import { parseNumber } from '../lib/format'
+import { formatNumber, parseNumber } from '../lib/format'
 import { canEdit, type Product } from '../lib/types'
 import { CatalogField } from './CatalogField'
 import {
@@ -119,6 +119,8 @@ export function ProductFormPage() {
     const next: FieldErrors = {}
     if (!form.name.trim()) next.name = t('products.errors.nameRequired')
     for (const field of NUMBER_FIELDS) {
+      // Al editar, el stock solo cambia con movimientos.
+      if (field === 'stock' && !isNew) continue
       const value = parseNumber(form[field])
       if (value === null) next[field] = t('products.errors.number')
       else if (value < 0) next[field] = t('products.errors.negative')
@@ -161,7 +163,7 @@ export function ProductFormPage() {
           unit: form.unit.trim() || 'unidad',
           cost: parseNumber(form.cost)!,
           price: parseNumber(form.price)!,
-          stock: parseNumber(form.stock)!,
+          ...(isNew && { stock: parseNumber(form.stock)! }),
           min_stock: parseNumber(form.minStock)!,
           category_id: form.categoryId || null,
           location_id: form.locationId || null,
@@ -258,7 +260,30 @@ export function ProductFormPage() {
           />
           <TextField name="cost" label={t('products.fields.cost')} inputMode="decimal" value={form.cost} onChange={set('cost')} error={errors.cost} />
           <TextField name="price" label={t('products.fields.price')} inputMode="decimal" value={form.price} onChange={set('price')} error={errors.price} />
-          <TextField name="stock" label={t('products.fields.stock')} inputMode="decimal" value={form.stock} onChange={set('stock')} error={errors.stock} />
+          {isNew ? (
+            <TextField
+              name="stock"
+              label={t('products.fields.initialStock')}
+              inputMode="decimal"
+              value={form.stock}
+              onChange={set('stock')}
+              error={errors.stock}
+            />
+          ) : (
+            <div className="flex flex-col gap-1">
+              <span className="font-medium">{t('products.fields.stock')}</span>
+              <p className="flex min-h-11 flex-wrap items-center gap-x-3">
+                <span>
+                  {formatNumber(product?.stock ?? 0)} {product?.unit}
+                </span>
+                {editable && (
+                  <Link to={`/movimientos/nuevo?producto=${id}`} className="text-brand-700 underline">
+                    {t('products.recordMovement')}
+                  </Link>
+                )}
+              </p>
+            </div>
+          )}
           <TextField
             name="minStock"
             label={t('products.fields.minStock')}
@@ -345,6 +370,11 @@ export function ProductFormPage() {
           {!isNew && (
             <LinkButton to={`/etiquetas?ids=${id}`} variant="secondary">
               {t('products.printLabel')}
+            </LinkButton>
+          )}
+          {!isNew && (
+            <LinkButton to={`/movimientos?producto=${id}`} variant="secondary">
+              {t('products.history')}
             </LinkButton>
           )}
           {!isNew && editable && (

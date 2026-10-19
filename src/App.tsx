@@ -1,4 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
+import { lazy } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider'
@@ -7,15 +8,22 @@ import { CompanyProvider } from './company/CompanyProvider'
 import { useCompany } from './company/context'
 import { Layout } from './components/Layout'
 import { Alert } from './components/ui/Alert'
-import { ImportExportPage } from './importExport/ImportExportPage'
 import { SupabaseContext } from './lib/client-context'
+import { MovementFormPage } from './movements/MovementFormPage'
+import { MovementsPage } from './movements/MovementsPage'
 import { CreateCompanyPage } from './pages/CreateCompanyPage'
 import { DashboardPage } from './pages/DashboardPage'
 import { LoginPage } from './pages/LoginPage'
-import { NotFoundPage, PendingPage } from './pages/SimplePages'
-import { LabelsPage } from './products/LabelsPage'
+import { NotFoundPage } from './pages/SimplePages'
 import { ProductFormPage } from './products/ProductFormPage'
 import { ProductsPage } from './products/ProductsPage'
+import { TeamPage } from './team/TeamPage'
+
+// Páginas con librerías pesadas (códigos de barras, Excel): se descargan solo al abrirlas.
+const LabelsPage = lazy(() => import('./products/LabelsPage').then((m) => ({ default: m.LabelsPage })))
+const ImportExportPage = lazy(() =>
+  import('./importExport/ImportExportPage').then((m) => ({ default: m.ImportExportPage })),
+)
 
 function FullScreenMessage({ children }: { children: React.ReactNode }) {
   return <main className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-4 px-4">{children}</main>
@@ -55,7 +63,9 @@ function CompanyGate() {
         <Route path="productos/nuevo" element={<ProductFormPage />} />
         <Route path="productos/:id" element={<EditProductRoute />} />
         <Route path="etiquetas" element={<LabelsPage />} />
-        <Route path="movimientos" element={<PendingPage titleKey="nav.movements" />} />
+        <Route path="movimientos" element={<MovementsPage />} />
+        <Route path="movimientos/nuevo" element={<MovementFormPage />} />
+        <Route path="equipo" element={<TeamPage />} />
         <Route path="importar" element={<ImportExportPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>

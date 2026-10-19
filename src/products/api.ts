@@ -4,6 +4,8 @@ import type { CatalogItem, CatalogTable, Product, ProductInput, ProductRow } fro
 export const PAGE_SIZE = 50
 export const IMAGE_BUCKET = 'product-images'
 export const MAX_IMAGE_BYTES = 2 * 1024 * 1024
+// Etiquetas por impresión.
+export const MAX_LABELS = 200
 
 export interface ProductFilters {
   query: string

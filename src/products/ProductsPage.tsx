@@ -10,9 +10,8 @@ import { SelectField } from '../components/ui/SelectField'
 import { TextField } from '../components/ui/TextField'
 import { useSupabase } from '../lib/client-context'
 import { canEdit, type ProductRow } from '../lib/types'
-import { MAX_LABELS } from './LabelsPage'
 import { ProductList } from './ProductList'
-import { countProducts, emptyFilters, PAGE_SIZE, searchProducts, type ProductFilters } from './api'
+import { countProducts, emptyFilters, MAX_LABELS, PAGE_SIZE, searchProducts, type ProductFilters } from './api'
 import { useCatalogs } from './useCatalogs'
 
 const SEARCH_DELAY_MS = 300
@@ -27,7 +26,11 @@ export function ProductsPage() {
   const { catalogs } = useCatalogs(companyId)
 
   const [queryInput, setQueryInput] = useState('')
-  const [filters, setFilters] = useState<ProductFilters>(emptyFilters)
+  // ?bajo=1 abre la lista filtrada por stock bajo (enlace desde el panel).
+  const [filters, setFilters] = useState<ProductFilters>(() => ({
+    ...emptyFilters,
+    lowStock: new URLSearchParams(location.search).has('bajo'),
+  }))
   const [rows, setRows] = useState<ProductRow[]>([])
   const [total, setTotal] = useState<number | null>(null)
   const [hasMore, setHasMore] = useState(false)
