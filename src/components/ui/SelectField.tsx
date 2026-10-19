@@ -32,7 +32,7 @@ export const SelectField = forwardRef<HTMLSelectElement, Props>(function SelectF
         id={selectId}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-11 w-full min-w-0 rounded-md border bg-white px-2 text-base ${error ? 'border-danger' : 'border-slate-500'}`}
+        className={`min-h-11 w-full min-w-0 rounded-lg border bg-white transition-colors hover:border-brand-700 px-2 text-base ${error ? 'border-danger' : 'border-slate-500'}`}
         {...rest}
       >
         {children}

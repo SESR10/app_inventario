@@ -149,7 +149,7 @@ export function TeamPage() {
       {loadError && <Alert tone="error">{t('team.loadError')}</Alert>}
 
       {isAdmin ? (
-        <form noValidate onSubmit={onInvite} className="flex flex-col gap-3 rounded-lg border border-line bg-white p-4">
+        <form noValidate onSubmit={onInvite} className="flex flex-col gap-3 rounded-xl border border-line bg-white shadow-sm p-4">
           <h2 className="text-xl font-semibold">{t('team.inviteTitle')}</h2>
           <div className="grid gap-3 sm:grid-cols-[1fr_14rem_auto] sm:items-start">
             <TextField
@@ -184,7 +184,7 @@ export function TeamPage() {
         </h2>
         {members === null && !loadError && <p role="status">{t('app.loading')}</p>}
         {members && (
-          <ul className="divide-y divide-line rounded-lg border border-line bg-white">
+          <ul className="divide-y divide-line rounded-xl border border-line bg-white shadow-sm">
             {members.map((m) => (
               <li key={m.user_id} className="flex flex-col gap-2 px-3 py-3 sm:flex-row sm:items-center sm:justify-between">
                 <span className="min-w-0 break-words font-medium">
@@ -223,7 +223,7 @@ export function TeamPage() {
             {t('team.pending')}
           </h2>
           <p className="text-muted">{t('team.pendingHelp')}</p>
-          <ul className="divide-y divide-line rounded-lg border border-line bg-white">
+          <ul className="divide-y divide-line rounded-xl border border-line bg-white shadow-sm">
             {invitations.map((inv) => (
               <li key={inv.email} className="flex flex-wrap items-center justify-between gap-2 px-3 py-2">
                 <span className="min-w-0 break-words">

@@ -44,7 +44,7 @@ describe('App', () => {
       memberships: [{ role: 'admin', company: { id: 'c1', name: 'Ferretería Sol' } }],
     })
     const { container } = render(<App client={client} />)
-    expect(await screen.findByRole('heading', { name: 'Panel' })).toHaveFocus()
+    expect(await screen.findByRole('heading', { name: 'Resumen de Ferretería Sol' })).toHaveFocus()
     expect(screen.getByRole('navigation', { name: 'Menú principal' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Saltar al contenido principal' })).toHaveAttribute('href', '#contenido')
     expect(document.title).toBe('Panel · Inventario')

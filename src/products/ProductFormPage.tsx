@@ -229,7 +229,7 @@ export function ProductFormPage() {
       </div>
 
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
-        <fieldset disabled={!editable} className="grid gap-4 rounded-lg border border-line bg-white p-4 sm:grid-cols-2">
+        <fieldset disabled={!editable} className="grid gap-4 rounded-xl border border-line bg-white shadow-sm p-4 sm:grid-cols-2">
           <TextField
             name="name"
             label={t('products.fields.name')}

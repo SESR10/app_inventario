@@ -9,7 +9,7 @@ import { formatDate, formatQuantity, reasonText, typeBadge } from './format'
 export function MovementList({ rows, label }: { rows: Movement[]; label: string }) {
   const { t } = useTranslation()
   return (
-    <ol aria-label={label} className="@container divide-y divide-line rounded-lg border border-line bg-white">
+    <ol aria-label={label} className="@container divide-y divide-line rounded-xl border border-line bg-white shadow-sm">
       {rows.map((m) => (
         <li key={m.id} className="flex flex-col gap-1 px-3 py-3 @xl:flex-row @xl:items-start @xl:gap-4">
           <div className="flex items-center gap-2 @xl:w-44 @xl:shrink-0 @xl:flex-col @xl:items-start">

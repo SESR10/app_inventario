@@ -9,7 +9,7 @@ const tones = {
 // Los errores se anuncian de inmediato; el resto de mensajes, de forma educada.
 export function Alert({ tone = 'info', children }: { tone?: keyof typeof tones; children: ReactNode }) {
   return (
-    <div role={tone === 'error' ? 'alert' : 'status'} className={`rounded-md border-l-4 px-4 py-3 ${tones[tone]}`}>
+    <div role={tone === 'error' ? 'alert' : 'status'} className={`rounded-lg border-l-4 px-4 py-3 shadow-sm ${tones[tone]}`}>
       {children}
     </div>
   )

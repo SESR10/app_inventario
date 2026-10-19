@@ -1,5 +1,7 @@
+import { Barcode, BellRing, FileSpreadsheet } from 'lucide-react'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Logo } from '../components/Logo'
 import { PageHeading } from '../components/PageHeading'
 import { Alert } from '../components/ui/Alert'
 import { Button } from '../components/ui/Button'
@@ -63,41 +65,80 @@ export function LoginPage() {
   }
 
   return (
-    <main id="contenido" className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-4 py-10">
-      <p className="text-lg font-bold">{t('app.name')}</p>
-      <PageHeading title={title}>{title}</PageHeading>
+    <div className="min-h-dvh lg:grid lg:grid-cols-2">
+      <BrandPanel />
+      <main id="contenido" className="mx-auto flex min-h-dvh w-full max-w-md flex-col justify-center gap-6 px-4 py-10">
+        <Logo className="lg:hidden" />
+        <div className="flex flex-col gap-1">
+          <PageHeading title={title}>{title}</PageHeading>
+          <p className="text-muted">{mode === 'signIn' ? t('auth.signInIntro') : t('auth.signUpIntro')}</p>
+        </div>
 
-      {formError && <Alert tone="error">{formError}</Alert>}
-      {notice && <Alert tone="success">{notice}</Alert>}
+        {formError && <Alert tone="error">{formError}</Alert>}
+        {notice && <Alert tone="success">{notice}</Alert>}
 
-      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4 rounded-lg border border-line bg-white p-5">
-        <TextField
-          label={t('auth.email')}
-          type="email"
-          autoComplete="email"
-          required
-          value={email}
-          onChange={(e) => setEmail(e.target.value)}
-          error={errors.email}
-        />
-        <TextField
-          label={t('auth.password')}
-          type="password"
-          autoComplete={mode === 'signIn' ? 'current-password' : 'new-password'}
-          required
-          hint={mode === 'signUp' ? t('auth.passwordHint') : undefined}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          error={errors.password}
-        />
-        <Button type="submit" busy={busy}>
-          {mode === 'signIn' ? t('auth.signIn') : t('auth.signUp')}
+        <form
+          noValidate
+          onSubmit={onSubmit}
+          className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6"
+        >
+          <TextField
+            label={t('auth.email')}
+            type="email"
+            autoComplete="email"
+            required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
+            error={errors.email}
+          />
+          <TextField
+            label={t('auth.password')}
+            type="password"
+            autoComplete={mode === 'signIn' ? 'current-password' : 'new-password'}
+            required
+            hint={mode === 'signUp' ? t('auth.passwordHint') : undefined}
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            error={errors.password}
+          />
+          <Button type="submit" busy={busy}>
+            {mode === 'signIn' ? t('auth.signIn') : t('auth.signUp')}
+          </Button>
+        </form>
+
+        <Button variant="ghost" onClick={switchMode}>
+          {mode === 'signIn' ? t('auth.toSignUp') : t('auth.toSignIn')}
         </Button>
-      </form>
+      </main>
+    </div>
+  )
+}
 
-      <Button variant="ghost" onClick={switchMode}>
-        {mode === 'signIn' ? t('auth.toSignUp') : t('auth.toSignIn')}
-      </Button>
-    </main>
+// Presentación de la app al lado del formulario (solo en pantallas grandes).
+function BrandPanel() {
+  const { t } = useTranslation()
+  const features = [
+    { icon: Barcode, text: t('auth.features.labels') },
+    { icon: FileSpreadsheet, text: t('auth.features.excel') },
+    { icon: BellRing, text: t('auth.features.alerts') },
+  ]
+  return (
+    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-brand-700 via-brand-900 to-brand-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+      <Logo wordClassName="text-white" />
+      <div className="relative flex max-w-md flex-col gap-6">
+        <p className="text-4xl leading-tight font-extrabold tracking-tight">{t('auth.tagline')}</p>
+        <ul className="flex flex-col gap-3">
+          {features.map(({ icon: Icon, text }) => (
+            <li key={text} className="flex items-center gap-3 text-lg text-brand-100">
+              <span className="grid size-10 place-items-center rounded-xl bg-white/10 text-accent-300">
+                <Icon aria-hidden="true" className="size-5" />
+              </span>
+              {text}
+            </li>
+          ))}
+        </ul>
+      </div>
+      <p className="text-sm text-brand-200">{t('auth.footer')}</p>
+    </aside>
   )
 }

@@ -47,7 +47,7 @@ export function ProductList({ rows, total, hasMore, loading, selected, onToggle,
     <div className="flex flex-col gap-3">
       <div
         ref={scrollRef}
-        className="h-[60dvh] min-h-80 overflow-auto rounded-lg border border-line bg-white"
+        className="h-[60dvh] min-h-80 overflow-auto rounded-xl border border-line bg-white shadow-sm"
         tabIndex={-1}
       >
         <ul

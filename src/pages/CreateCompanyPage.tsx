@@ -2,6 +2,7 @@ import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuth } from '../auth/context'
 import { useCompany } from '../company/context'
+import { Logo } from '../components/Logo'
 import { PageHeading } from '../components/PageHeading'
 import { Alert } from '../components/ui/Alert'
 import { Button } from '../components/ui/Button'
@@ -39,12 +40,13 @@ export function CreateCompanyPage() {
 
   return (
     <main id="contenido" className="mx-auto flex min-h-dvh max-w-md flex-col justify-center gap-6 px-4 py-10">
+      <Logo />
       <PageHeading title={t('company.createTitle')}>{t('company.createTitle')}</PageHeading>
       <p className="text-muted">{t('company.createIntro')}</p>
 
       {formError && <Alert tone="error">{formError}</Alert>}
 
-      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4 rounded-lg border border-line bg-white p-5">
+      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4 rounded-xl border border-line bg-white shadow-sm p-5">
         <TextField
           label={t('company.name')}
           required
