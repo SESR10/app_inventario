@@ -26,6 +26,13 @@ App web de inventario multiempresa. La especificación completa está en [CLAUDE
 | `npm run lint` | Linter (oxlint) |
 | `npm test` | Pruebas de interfaz y accesibilidad (Vitest + axe) |
 
+## Publicar (Vercel)
+
+1. Importa el repositorio en Vercel (Framework: Vite) y agrega las variables `VITE_SUPABASE_URL` y
+   `VITE_SUPABASE_ANON_KEY`.
+2. En Supabase, Authentication > URL Configuration: Site URL = la dirección de Vercel; agrega
+   `http://localhost:5173` en Redirect URLs para seguir probando en local.
+
 ## Estructura
 
 - `src/auth`, `src/company`: sesión y empresa activa

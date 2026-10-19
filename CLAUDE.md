@@ -42,7 +42,7 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 5 terminada (nueva interfaz). Las fases 1 a 4 del plan original están completas.
+- Fase actual: 6 terminada (publicación en Vercel). Las fases 1 a 4 del plan original están completas.
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
@@ -75,3 +75,7 @@ grandes, facilidad de uso y apariencia profesional.
   ámbar en `src/index.css`, fuente Plus Jakarta Sans (@fontsource, sin CDN) e íconos lucide-react. Menú lateral
   oscuro en escritorio y menú fijo abajo en celular (un solo `<nav>`; nada de `backdrop-filter` en el header,
   rompe el `fixed`). Panel con encabezado de bienvenida y tarjetas con ícono; ingreso con presentación de la app.
+- Fase 6: publicación en Vercel. `vercel.json` reescribe toda ruta a `index.html` (rutas de React Router) y
+  el registro manda `emailRedirectTo: window.location.origin`. En Vercel van `VITE_SUPABASE_URL` y
+  `VITE_SUPABASE_ANON_KEY`; en Supabase (Authentication > URL Configuration), Site URL = dirección de Vercel
+  y `http://localhost:5173` en Redirect URLs.
