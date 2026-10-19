@@ -50,7 +50,11 @@ export function LoginPage() {
         )
       }
     } else {
-      const { data, error } = await client.auth.signUp(credentials)
+      // El correo de confirmación vuelve a esta misma dirección (local o publicada).
+      const { data, error } = await client.auth.signUp({
+        ...credentials,
+        options: { emailRedirectTo: window.location.origin },
+      })
       if (error) setFormError(t('auth.errors.generic'))
       else if (!data.session) setNotice(t('auth.checkEmail'))
     }
