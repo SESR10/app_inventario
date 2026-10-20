@@ -21,6 +21,7 @@ function setup(role: AppRole = 'admin') {
     memberships: [{ role, company: { id: 'c1', name: 'Ferretería Sol' } }],
     rpc: {
       existing_skus: () => ['T-1'],
+      delete_products: () => ({ deleted: 1, in_kit: 0, images: [] }),
       import_products: (args) => {
         const rows = args.p_rows as { sku: string | null }[]
         const updated = rows.filter((r) => r.sku === 'T-1').length
@@ -92,12 +93,19 @@ describe('Importar y exportar', () => {
     expect(client.rpc).toHaveBeenCalledWith('import_products', {
       p_company: 'c1',
       p_update_existing: true,
+      p_import: expect.any(String),
       p_rows: [
         expect.objectContaining({ sku: null, name: 'Martillo', price: 25000, stock: 5, cost: null }),
         expect.objectContaining({ sku: 'T-1', name: null, price: 300 }),
       ],
     })
     expect(screen.getByRole('link', { name: 'Ver productos' })).toHaveAttribute('href', '/productos')
+
+    const importId = (vi.mocked(client.rpc).mock.calls.find(([name]) => name === 'import_products')![1] as { p_import: string }).p_import
+    await user.click(screen.getByRole('button', { name: 'Deshacer esta importación' }))
+    await user.click(await screen.findByRole('button', { name: 'Borrar 1 producto nuevo' }))
+    expect(await screen.findByText('Importación deshecha: se borró 1 producto nuevo.')).toBeInTheDocument()
+    expect(client.rpc).toHaveBeenCalledWith('delete_products', { p_company: 'c1', p_import: importId })
   })
 
   it('importa el Excel como lo tiene la empresa: hoja, fila de títulos, otros datos y correcciones', async () => {

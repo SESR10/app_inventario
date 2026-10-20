@@ -97,3 +97,7 @@ grandes, facilidad de uso y apariencia profesional.
   ("MTR2" → m²); filas de categoría ("PINTURAS") y de totales; Caja y Pieza leídas del nombre en m²
   ("30*60 - 1.62 - 9", comprobado con la medida de la pieza); "Otros datos" con nombre claro y visibles en la
   ficha y en la exportación; corrección de errores en pantalla. Probado con un Excel real de 4.763 productos.
+  Eliminar en bloque (migración `20261021100000_eliminar_en_bloque.sql`): `delete_products` por ids, por importación
+  (`products.import_id`) o por los filtros de la lista, en lotes de 1000 y sin borrar piezas de un kit. En Productos:
+  "Eliminar N productos" (selección) y, para administradores, "Eliminar todos"/"los de esta lista" con la palabra
+  ELIMINAR; al terminar una importación, "Deshacer esta importación" borra los productos nuevos que creó.

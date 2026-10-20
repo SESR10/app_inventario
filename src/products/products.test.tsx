@@ -29,6 +29,7 @@ function setup(path: string, role: AppRole = 'admin') {
     rpc: {
       search_products: (args) => (args.p_low_stock ? rows.slice(0, 1) : rows),
       count_products: (args) => (args.p_low_stock ? 1 : 2),
+      delete_products: (args) => ({ deleted: (args.p_ids as string[] | undefined)?.length ?? 2, in_kit: 0, images: [] }),
     },
   })
   const view = render(<App client={client} />)
@@ -68,10 +69,38 @@ describe('Productos', () => {
     expect(window.print).toHaveBeenCalled()
   })
 
+  it('elimina los productos seleccionados de una vez', async () => {
+    const user = userEvent.setup()
+    const { client } = setup('/productos')
+    await user.click(await screen.findByLabelText('Seleccionar Martillo'))
+    await user.click(screen.getByLabelText('Seleccionar Tornillo'))
+    await user.click(screen.getByRole('button', { name: 'Eliminar 2 productos' }))
+    const dialog = await screen.findByRole('dialog', { name: '¿Eliminar 2 productos?' })
+    expect((await axe(dialog)).violations).toEqual([])
+    await user.click(within(dialog).getByRole('button', { name: 'Eliminar 2 productos' }))
+    expect(await screen.findByText('Se eliminaron 2 productos.')).toBeInTheDocument()
+    expect(client.rpc).toHaveBeenCalledWith('delete_products', { p_company: 'c1', p_ids: ['p1', 'p2'] })
+  })
+
+  it('para eliminar todos pide escribir ELIMINAR', async () => {
+    const user = userEvent.setup()
+    const { client } = setup('/productos')
+    await user.click(await screen.findByRole('button', { name: 'Eliminar todos los productos (2)' }))
+    const dialog = await screen.findByRole('dialog')
+    const confirm = within(dialog).getByRole('button', { name: 'Eliminar 2 productos' })
+    expect(confirm).toBeDisabled()
+    await user.type(within(dialog).getByLabelText(/escribe ELIMINAR/), 'eliminar')
+    await user.click(confirm)
+    // El conteo falso sigue en 2: esos quedan como piezas de kit.
+    expect(await screen.findByText('Se eliminaron 2 productos. 2 no se eliminaron porque son piezas de un kit; elimina primero el kit.')).toBeInTheDocument()
+    expect(client.rpc).toHaveBeenCalledWith('delete_products', expect.objectContaining({ p_company: 'c1', p_query: null }))
+  })
+
   it('oculta la creación para usuarios de solo lectura', async () => {
     setup('/productos', 'viewer')
     await screen.findByText('2 productos')
     expect(screen.queryByRole('link', { name: 'Nuevo producto' })).not.toBeInTheDocument()
+    expect(screen.queryByRole('button', { name: /^Eliminar/ })).not.toBeInTheDocument()
   })
 })
 

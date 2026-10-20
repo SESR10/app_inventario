@@ -4,6 +4,8 @@ import { useCompany } from '../company/context'
 import { Alert } from '../components/ui/Alert'
 import { Button, LinkButton } from '../components/ui/Button'
 import { Checkbox } from '../components/ui/Checkbox'
+import { ConfirmDialog } from '../components/ui/ConfirmDialog'
+import { deleteProducts } from '../products/api'
 import { SelectField } from '../components/ui/SelectField'
 import { TextField } from '../components/ui/TextField'
 import { formatNumber } from '../lib/format'
@@ -35,6 +37,8 @@ interface Progress {
   total: number
   failed: boolean
   result: ImportResult
+  // Id de esta importación: marca los productos nuevos para poder deshacerla.
+  importId: string
 }
 
 // Identifica el formato del archivo por sus títulos, para recordar qué columna es cuál.
@@ -68,6 +72,8 @@ export function ImportWizard() {
   const [categoryRows, setCategoryRows] = useState(false)
   const [usedSaved, setUsedSaved] = useState(false)
   const [fixes, setFixes] = useState<Record<string, string>>({})
+  const [undo, setUndo] = useState<'confirm' | 'busy' | 'done' | 'error' | null>(null)
+  const [undone, setUndone] = useState(0)
   const [fileError, setFileError] = useState<string | null>(null)
   const [reading, setReading] = useState(false)
   const [mapping, setMapping] = useState<Mapping>(() => guessMapping([]))
@@ -180,6 +186,7 @@ export function ImportWizard() {
     setFixes({})
     setReview(null)
     setProgress(null)
+    setUndo(null)
     setStep('file')
   }
 
@@ -239,7 +246,7 @@ export function ImportWizard() {
     setStep('importing')
     for (let i = state.done; i < queue.length; i += IMPORT_BATCH) {
       try {
-        const result = await importBatch(client, companyId, queue.slice(i, i + IMPORT_BATCH), updateExisting)
+        const result = await importBatch(client, companyId, queue.slice(i, i + IMPORT_BATCH), updateExisting, state.importId)
         state = {
           ...state,
           done: Math.min(i + IMPORT_BATCH, queue.length),
@@ -293,7 +300,20 @@ export function ImportWizard() {
       total: queue.length,
       failed: false,
       result: { created: 0, updated: 0, skipped: review.skipped },
+      importId: crypto.randomUUID(),
     })
+  }
+
+  async function undoImport() {
+    if (!progress) return
+    setUndo('busy')
+    try {
+      const { deleted } = await deleteProducts(client, companyId, { importId: progress.importId })
+      setUndone(deleted)
+      setUndo('done')
+    } catch {
+      setUndo('error')
+    }
   }
 
   // Un valor de ejemplo de la columna, para reconocerla aunque el título sea un código ("marnom" → CORONA).
@@ -679,19 +699,39 @@ export function ImportWizard() {
     return (
       <div className="flex flex-col gap-3">
         {heading('importExport.step3')}
-        <Alert tone="success">
-          {t('importExport.done', {
-            created: formatNumber(created),
-            updated: formatNumber(updated),
-            skipped: formatNumber(skipped),
-          })}
-        </Alert>
+        {undo === 'done' ? (
+          <Alert tone="success">{t('importExport.undone', { count: undone })}</Alert>
+        ) : (
+          <Alert tone="success">
+            {t('importExport.done', {
+              created: formatNumber(created),
+              updated: formatNumber(updated),
+              skipped: formatNumber(skipped),
+            })}
+          </Alert>
+        )}
+        {undo === 'error' && <Alert tone="error">{t('importExport.undoError')}</Alert>}
         <div className="flex flex-wrap gap-3">
           <LinkButton to="/productos">{t('importExport.viewProducts')}</LinkButton>
           <Button variant="secondary" onClick={restart}>
             {t('importExport.importAnother')}
           </Button>
+          {created > 0 && undo !== 'done' && (
+            <Button variant="secondary" onClick={() => setUndo('confirm')}>
+              {t('importExport.undo')}
+            </Button>
+          )}
         </div>
+        <ConfirmDialog
+          open={undo === 'confirm' || undo === 'busy'}
+          title={t('importExport.undoTitle')}
+          body={t('importExport.undoBody', { count: created })}
+          confirmLabel={t('importExport.undoConfirm', { count: created })}
+          cancelLabel={t('importExport.undoCancel')}
+          busy={undo === 'busy'}
+          onConfirm={() => void undoImport()}
+          onCancel={() => undo !== 'busy' && setUndo(null)}
+        />
       </div>
     )
   }

@@ -30,11 +30,14 @@ export async function importBatch(
   companyId: string,
   rows: ImportRecord[],
   updateExisting: boolean,
+  // Marca los productos nuevos para poder deshacer la importación.
+  importId: string | null = null,
 ): Promise<ImportResult> {
   const { data, error } = await client.rpc('import_products', {
     p_company: companyId,
     p_rows: rows,
     p_update_existing: updateExisting,
+    p_import: importId,
   })
   if (error) throw error
   return data as ImportResult
