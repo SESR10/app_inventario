@@ -1,20 +1,32 @@
-import { useEffect, useRef, useState, type ChangeEvent } from 'react'
+import { useEffect, useMemo, useRef, useState, type ChangeEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useCompany } from '../company/context'
 import { Alert } from '../components/ui/Alert'
 import { Button, LinkButton } from '../components/ui/Button'
+import { Checkbox } from '../components/ui/Checkbox'
 import { SelectField } from '../components/ui/SelectField'
 import { TextField } from '../components/ui/TextField'
 import { formatNumber } from '../lib/format'
 import { useSupabase } from '../lib/client-context'
-import { existingSkus, IMPORT_BATCH, importBatch, type ImportResult } from './api'
-import { FIELDS, guessMapping, MAX_LENGTH, NUMBER_FIELDS, type FieldKey, type Mapping } from './fields'
-import { downloadWorkbook, readSheet, today, type SheetData } from './sheet'
-import { reviewRows, skusInFile, type ImportRecord, type Issue, type Review } from './validate'
+import { existingSkus, IMPORT_BATCH, importBatch, loadFormat, saveFormat, type ImportResult } from './api'
+import {
+  detectHeaderRow, FIELDS, friendlyKey, guessMapping, MAX_LENGTH, normalizeHeader, NUMBER_FIELDS, type FieldKey, type Mapping,
+} from './fields'
+import {
+  columnLetter, countRowsWithData, downloadWorkbook, readWorkbook, sheetData, today, type Cell, type SheetData,
+  type WorkbookSheet,
+} from './sheet'
+import {
+  columnStats, countBoxesInNames, countCategoryRows, reviewRows, skusInFile, type ImportRecord, type Issue,
+  type Review,
+} from './validate'
 
 const MAX_FILE_MB = 20
 const MAX_ISSUES_SHOWN = 100
 const PREVIEW_ROWS = 10
+// Hasta cuántas columnas extra se guardan por producto, y filas que se ofrecen como fila de títulos.
+const MAX_EXTRA = 30
+const HEADER_CHOICES = 30
 
 type Step = 'file' | 'map' | 'review' | 'importing' | 'done'
 
@@ -25,11 +37,15 @@ interface Progress {
   result: ImportResult
 }
 
-const columnLetter = (index: number) => {
-  let letter = ''
-  for (let n = index + 1; n > 0; n = Math.floor((n - 1) / 26)) letter = String.fromCharCode(65 + ((n - 1) % 26)) + letter
-  return letter
-}
+// Identifica el formato del archivo por sus títulos, para recordar qué columna es cuál.
+const formatSignature = (headers: string[]) => headers.map(normalizeHeader).join('|').slice(0, 4000)
+
+const rowPreview = (row: Cell[] = []) =>
+  row
+    .filter((c) => c != null && String(c).trim() !== '')
+    .slice(0, 4)
+    .map((c) => String(c).trim().slice(0, 24))
+    .join(' · ')
 
 // Asistente de importación: archivo → columnas → revisión → importación por lotes.
 export function ImportWizard() {
@@ -40,7 +56,18 @@ export function ImportWizard() {
 
   const [step, setStep] = useState<Step>('file')
   const [fileName, setFileName] = useState('')
+  const [workbook, setWorkbook] = useState<WorkbookSheet[]>([])
+  const [sheetIndex, setSheetIndex] = useState(0)
+  const [headerRow, setHeaderRow] = useState(0)
   const [sheet, setSheet] = useState<SheetData | null>(null)
+  const [stats, setStats] = useState<ReturnType<typeof columnStats>[]>([])
+  const [extraColumns, setExtraColumns] = useState<Set<number>>(new Set())
+  const [extraNames, setExtraNames] = useState<Record<number, string>>({})
+  const [boxFromName, setBoxFromName] = useState(true)
+  const [showFixed, setShowFixed] = useState(false)
+  const [categoryRows, setCategoryRows] = useState(false)
+  const [usedSaved, setUsedSaved] = useState(false)
+  const [fixes, setFixes] = useState<Record<string, string>>({})
   const [fileError, setFileError] = useState<string | null>(null)
   const [reading, setReading] = useState(false)
   const [mapping, setMapping] = useState<Mapping>(() => guessMapping([]))
@@ -63,6 +90,58 @@ export function ImportWizard() {
 
   const columns = (field: FieldKey) => t(`importExport.columns.${field}`)
 
+  const categoryCount = useMemo(() => (sheet ? countCategoryRows(sheet.rows) : 0), [sheet])
+  const boxCount = useMemo(() => (sheet ? countBoxesInNames(sheet.rows, mapping) : 0), [sheet, mapping])
+
+  // Abre una hoja: busca la fila de títulos, propone las columnas y, si este formato ya se importó
+  // antes en la empresa, usa lo que se eligió esa vez.
+  async function openSheet(sheets: WorkbookSheet[], index: number, row?: number) {
+    const cells = sheets[index].cells
+    const titleRow = row ?? detectHeaderRow(cells).row
+    const data = sheetData(cells, titleRow)
+    const info = data.headers.map((_, c) => columnStats(data.rows, c))
+    let nextMapping = guessMapping(
+      data.headers,
+      info.map((i) => i.useful),
+    )
+    const mapped = new Set(Object.values(nextMapping))
+    // Se proponen como "Otros datos" las columnas que cambian de un producto a otro (no las vacías ni las fijas).
+    let extras = info.flatMap((i, c) => (!mapped.has(c) && i.distinct >= 2 ? [c] : [])).slice(0, MAX_EXTRA)
+    let names: Record<number, string> = {}
+    let update = true
+    let categories = countCategoryRows(data.rows) >= 2 && nextMapping.category === null
+    let boxes = true
+    const saved = await loadFormat(client, companyId, formatSignature(data.headers)).catch(() => null)
+    if (saved) {
+      const byTitle = (title: string) => {
+        const c = data.headers.indexOf(title)
+        return c >= 0 ? c : null
+      }
+      nextMapping = Object.fromEntries(FIELDS.map((f) => [f, saved.mapping[f] ? byTitle(saved.mapping[f]) : null])) as Mapping
+      const kept = saved.extra.flatMap((e) => {
+        const c = byTitle(e.column)
+        return c === null ? [] : [{ c, as: e.as }]
+      })
+      extras = kept.map((k) => k.c)
+      names = Object.fromEntries(kept.map((k) => [k.c, k.as]))
+      update = saved.updateExisting
+      categories = saved.categoryRows
+      boxes = saved.boxFromName ?? true
+    }
+    setSheetIndex(index)
+    setHeaderRow(titleRow)
+    setSheet(data)
+    setStats(info)
+    setMapping(nextMapping)
+    setExtraColumns(new Set(extras))
+    setExtraNames(names)
+    setBoxFromName(boxes)
+    setUpdateExisting(update)
+    setCategoryRows(categories)
+    setUsedSaved(saved !== null)
+    setMapError(null)
+  }
+
   async function handleFile(event: ChangeEvent<HTMLInputElement>) {
     const file = event.target.files?.[0]
     if (!file) return
@@ -73,15 +152,20 @@ export function ImportWizard() {
     }
     setReading(true)
     try {
-      const data = await readSheet(file)
-      if (data.rows.length === 0) {
+      const sheets = await readWorkbook(file)
+      if (sheets.length === 0) {
         setFileError(t('importExport.fileEmpty'))
         return
       }
+      // La hoja que más parece una lista de productos (más títulos reconocidos y luego más filas).
+      const scores = sheets.map((s) => detectHeaderRow(s.cells).score)
+      const best = sheets.reduce(
+        (b, s, i) => (scores[i] > scores[b] || (scores[i] === scores[b] && s.cells.length > sheets[b].cells.length) ? i : b),
+        0,
+      )
       setFileName(file.name)
-      setSheet(data)
-      setMapping(guessMapping(data.headers))
-      setMapError(null)
+      setWorkbook(sheets)
+      await openSheet(sheets, best)
       setStep('map')
     } catch {
       setFileError(t('importExport.fileError'))
@@ -92,13 +176,31 @@ export function ImportWizard() {
 
   function restart() {
     setSheet(null)
+    setWorkbook([])
+    setFixes({})
     setReview(null)
     setProgress(null)
     setStep('file')
   }
 
-  async function handleReview() {
-    if (!sheet) return
+  const mappedColumns = new Set(FIELDS.map((f) => mapping[f]).filter((c) => c !== null))
+  const extraOptions = sheet
+    ? sheet.headers.flatMap((header, c) => (!mappedColumns.has(c) && stats[c]?.filled > 0 ? [{ c, header }] : []))
+    : []
+  const defaultName = (c: number) => {
+    const header = sheet?.headers[c] ?? ''
+    const key = sheet ? friendlyKey(header, sheet.headers) : null
+    return key ? t(`importExport.friendly.${key}`) : header
+  }
+  const extraName = (c: number) => (extraNames[c] ?? '').trim() || defaultName(c)
+  const chosenExtra = extraOptions.filter((o) => extraColumns.has(o.c))
+  // Columnas con el mismo valor en todas las filas (como un código de impuesto): se ocultan salvo que se pidan.
+  const fixedCount = extraOptions.filter((o) => stats[o.c].distinct < 2 && !extraColumns.has(o.c)).length
+  const shownExtra = showFixed ? extraOptions : extraOptions.filter((o) => stats[o.c].distinct >= 2 || extraColumns.has(o.c))
+
+  async function handleReview(data: SheetData | null = sheet) {
+    if (!data) return
+    const sheet = data
     const chosen = FIELDS.map((f) => mapping[f]).filter((c) => c !== null)
     const repeated = chosen.find((c, i) => chosen.indexOf(c) !== i)
     if (repeated !== undefined) {
@@ -113,7 +215,16 @@ export function ImportWizard() {
     setChecking(true)
     try {
       const existing = await existingSkus(client, companyId, skusInFile(sheet.rows, mapping))
-      setReview(reviewRows(sheet.rows, mapping, existing, updateExisting))
+      setReview(
+        reviewRows(sheet.rows, mapping, existing, updateExisting, {
+          firstRow: sheet.firstRow,
+          extraColumns: chosenExtra.map((o) => ({ column: o.c, title: extraName(o.c) })),
+          categoryRows,
+          boxFromName:
+            boxFromName && boxCount > 0 ? { box: t('importExport.boxName'), piece: t('importExport.pieceName') } : null,
+        }),
+      )
+      setFixes({})
       setStep('review')
     } catch {
       setMapError(t('importExport.reviewError'))
@@ -149,14 +260,51 @@ export function ImportWizard() {
 
   const queue = review ? [...review.toCreate, ...review.toUpdate] : []
 
+  // Cambia en las filas leídas los datos corregidos en pantalla y vuelve a revisar.
+  function applyFixes() {
+    if (!sheet) return
+    const rows = [...sheet.rows]
+    for (const [key, value] of Object.entries(fixes)) {
+      const [index, column] = key.split(':').map(Number)
+      rows[index] = [...rows[index]]
+      rows[index][column] = value
+    }
+    const data = { ...sheet, rows }
+    setSheet(data)
+    void handleReview(data)
+  }
+
   function startImport() {
-    if (!review) return
+    if (!review || !sheet) return
+    const titles = Object.fromEntries(
+      FIELDS.flatMap((f) => (mapping[f] === null ? [] : [[f, sheet.headers[mapping[f]!]]])),
+    )
+    void saveFormat(client, companyId, formatSignature(sheet.headers), {
+      sheet: workbook[sheetIndex]?.name ?? '',
+      headerRow,
+      mapping: titles,
+      extra: chosenExtra.map((o) => ({ column: o.header, as: extraName(o.c) })),
+      updateExisting,
+      categoryRows,
+      boxFromName,
+    }).catch(() => undefined)
     void runImport(queue, {
       done: 0,
       total: queue.length,
       failed: false,
       result: { created: 0, updated: 0, skipped: review.skipped },
     })
+  }
+
+  // Un valor de ejemplo de la columna, para reconocerla aunque el título sea un código ("marnom" → CORONA).
+  const exampleValue = (c: number) => {
+    const cell = sheet?.rows.find((r) => r[c] != null && r[c] !== false && /[\p{L}\p{N}]/u.test(String(r[c])))?.[c]
+    return cell == null ? '' : String(typeof cell === 'number' ? formatNumber(cell) : cell).trim().slice(0, 30)
+  }
+
+  const cellValue = (issue: Issue) => {
+    const cell = sheet?.rows[issue.index]?.[issue.column!]
+    return cell == null ? '' : String(cell)
   }
 
   const problemText = (issue: Issue) =>
@@ -207,11 +355,45 @@ export function ImportWizard() {
       <div className="flex flex-col gap-4">
         {heading('importExport.step2')}
         <div className="flex flex-wrap items-center gap-x-4 gap-y-1">
-          <p className="font-medium">{t('importExport.fileSummary', { name: fileName, count: sheet.rows.length })}</p>
+          <p className="font-medium">
+            {t('importExport.fileSummary', { name: fileName, count: countRowsWithData(sheet.rows) })}
+          </p>
           <Button variant="ghost" onClick={restart} className="px-0">
             {t('importExport.changeFile')}
           </Button>
         </div>
+        <div className="grid gap-4 sm:grid-cols-2">
+          {workbook.length > 1 && (
+            <SelectField
+              label={t('importExport.sheet')}
+              hint={t('importExport.sheetHint')}
+              value={sheetIndex}
+              onChange={(e) => void openSheet(workbook, Number(e.target.value))}
+            >
+              {workbook.map((w, i) => (
+                <option key={w.name} value={i}>
+                  {t('importExport.sheetOption', { name: w.name, count: w.cells.length })}
+                </option>
+              ))}
+            </SelectField>
+          )}
+          <SelectField
+            label={t('importExport.headerRow')}
+            hint={t('importExport.headerRowHint')}
+            value={headerRow}
+            onChange={(e) => void openSheet(workbook, sheetIndex, Number(e.target.value))}
+          >
+            {workbook[sheetIndex]?.cells.slice(0, HEADER_CHOICES).map((row, i) => {
+              const preview = rowPreview(row)
+              return preview ? (
+                <option key={i} value={i}>
+                  {t('importExport.headerRowOption', { row: i + 1, preview })}
+                </option>
+              ) : null
+            })}
+          </SelectField>
+        </div>
+        {usedSaved && <Alert tone="success">{t('importExport.savedFormat')}</Alert>}
         <p className="text-muted">{t('importExport.mapIntro')}</p>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {FIELDS.map((field) => (
@@ -226,12 +408,71 @@ export function ImportWizard() {
               <option value="">{t('importExport.notImported')}</option>
               {sheet.headers.map((header, index) => (
                 <option key={index} value={index}>
-                  {t('importExport.column', { header, letter: columnLetter(index) })}
+                  {exampleValue(index)
+                    ? t('importExport.columnExample', { header, letter: columnLetter(index), example: exampleValue(index) })
+                    : t('importExport.column', { header, letter: columnLetter(index) })}
                 </option>
               ))}
             </SelectField>
           ))}
         </div>
+        {extraOptions.length > 0 && (
+          <fieldset className="flex flex-col gap-1">
+            <legend className="mb-1 font-medium">{t('importExport.extraLegend')}</legend>
+            <p className="text-sm text-muted">{t('importExport.extraHint', { max: MAX_EXTRA })}</p>
+            <ul className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
+              {shownExtra.map(({ c, header }) => (
+                <li key={c} className="flex flex-col gap-1">
+                  <Checkbox
+                    label={t('importExport.extraColumn', {
+                      header,
+                      letter: columnLetter(c),
+                      example: exampleValue(c),
+                    })}
+                    checked={extraColumns.has(c)}
+                    disabled={!extraColumns.has(c) && chosenExtra.length >= MAX_EXTRA}
+                    onChange={(e) =>
+                      setExtraColumns((prev) => {
+                        const next = new Set(prev)
+                        if (e.target.checked) next.add(c)
+                        else next.delete(c)
+                        return next
+                      })
+                    }
+                  />
+                  {extraColumns.has(c) && (
+                    <TextField
+                      label={t('importExport.extraName', { header })}
+                      value={extraNames[c] ?? defaultName(c)}
+                      maxLength={60}
+                      onChange={(e) => setExtraNames((n) => ({ ...n, [c]: e.target.value }))}
+                      className="ml-7"
+                    />
+                  )}
+                </li>
+              ))}
+            </ul>
+            {fixedCount > 0 && (
+              <Button variant="ghost" onClick={() => setShowFixed((v) => !v)} className="self-start px-0">
+                {showFixed ? t('importExport.hideFixed') : t('importExport.showFixed', { count: fixedCount })}
+              </Button>
+            )}
+          </fieldset>
+        )}
+        {boxCount > 0 && (
+          <Checkbox
+            label={t('importExport.boxFromName', { count: boxCount })}
+            checked={boxFromName}
+            onChange={(e) => setBoxFromName(e.target.checked)}
+          />
+        )}
+        {categoryCount > 0 && (
+          <Checkbox
+            label={t('importExport.categoryRows', { count: categoryCount })}
+            checked={categoryRows}
+            onChange={(e) => setCategoryRows(e.target.checked)}
+          />
+        )}
         {mappedSku && (
           <fieldset className="flex flex-col gap-1">
             <legend className="mb-1 font-medium">{t('importExport.existingLegend')}</legend>
@@ -250,7 +491,7 @@ export function ImportWizard() {
           </fieldset>
         )}
         {mapError && <Alert tone="error">{mapError}</Alert>}
-        <Button onClick={handleReview} busy={checking} className="self-start">
+        <Button onClick={() => void handleReview()} busy={checking} className="self-start">
           {t('importExport.review')}
         </Button>
       </div>
@@ -265,6 +506,8 @@ export function ImportWizard() {
       ['summaryUpdate', review.toUpdate.length],
       ['summarySkip', review.skipped],
       ['summaryErrors', review.rowsWithErrors],
+      ['summaryCategories', review.categories],
+      ['summaryIgnored', review.ignored],
     ] as const
     return (
       <div className="flex flex-col gap-4">
@@ -290,6 +533,11 @@ export function ImportWizard() {
               {t('importExport.errorsTitle')}
             </h4>
             <p className="text-muted">{t('importExport.errorsHelp')}</p>
+            {Object.keys(fixes).length > 0 && (
+              <Button onClick={applyFixes} busy={checking} className="self-start">
+                {t('importExport.applyFixes', { count: Object.keys(fixes).length })}
+              </Button>
+            )}
             <div
               role="region"
               aria-label={t('importExport.errorsRegion')}
@@ -302,6 +550,7 @@ export function ImportWizard() {
                     <th scope="col" className="px-3 py-2">{t('importExport.colRow')}</th>
                     <th scope="col" className="px-3 py-2">{t('importExport.colColumn')}</th>
                     <th scope="col" className="px-3 py-2">{t('importExport.colProblem')}</th>
+                    <th scope="col" className="px-3 py-2">{t('importExport.colFix')}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -310,6 +559,18 @@ export function ImportWizard() {
                       <td className="px-3 py-2">{issue.row}</td>
                       <td className="px-3 py-2">{columns(issue.field)}</td>
                       <td className="px-3 py-2">{problemText(issue)}</td>
+                      <td className="px-3 py-1">
+                        {issue.column !== null && (
+                          <input
+                            aria-label={t('importExport.fixLabel', { row: issue.row, column: columns(issue.field) })}
+                            className="min-h-11 w-full min-w-32 rounded-lg border border-slate-500 bg-white px-2 text-base hover:border-brand-700"
+                            value={fixes[`${issue.index}:${issue.column}`] ?? cellValue(issue)}
+                            onChange={(e) =>
+                              setFixes((f) => ({ ...f, [`${issue.index}:${issue.column}`]: e.target.value }))
+                            }
+                          />
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -345,6 +606,11 @@ export function ImportWizard() {
                         {columns(f)}
                       </th>
                     ))}
+                    {chosenExtra.length > 0 && (
+                      <th scope="col" className="whitespace-nowrap px-3 py-2">
+                        {t('importExport.previewExtra')}
+                      </th>
+                    )}
                   </tr>
                 </thead>
                 <tbody>
@@ -355,6 +621,13 @@ export function ImportWizard() {
                           {typeof record[f] === 'number' ? formatNumber(record[f]) : record[f]}
                         </td>
                       ))}
+                      {chosenExtra.length > 0 && (
+                        <td className="min-w-48 px-3 py-2">
+                          {Object.entries(record.extra ?? {})
+                            .map(([k, v]) => `${k}: ${typeof v === 'number' ? formatNumber(v) : v}`)
+                            .join(' · ')}
+                        </td>
+                      )}
                     </tr>
                   ))}
                 </tbody>

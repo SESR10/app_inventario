@@ -62,13 +62,19 @@ function ExportCard() {
     setState({ busy: true, count: 0, done: false, error: false })
     try {
       const rows = await exportAll(client, current!.company.id, (count) => setState((s) => ({ ...s, count })))
-      const header = FIELDS.map((f) => t(`importExport.columns.${f}`))
+      // Los "Otros datos" de los productos salen como columnas al final, con su título.
+      const extraKeys = [...new Set(rows.flatMap((r) => Object.keys(r.extra ?? {})))]
+      const header = [...FIELDS.map((f) => t(`importExport.columns.${f}`)), ...extraKeys]
       const body: Cell[][] = rows.map((r) => [
         r.sku, r.name, r.category, r.unit, r.cost, r.price, r.stock, r.min_stock, r.location, r.supplier,
-        r.package_name, r.package_factor,
+        r.package_name, r.package_factor, ...extraKeys.map((k) => r.extra?.[k] ?? null),
       ])
       await downloadWorkbook(`${t('importExport.files.products')}-${today()}.xlsx`, [
-        { name: t('importExport.files.productsSheet'), rows: [header, ...body], widths: COLUMN_WIDTHS },
+        {
+          name: t('importExport.files.productsSheet'),
+          rows: [header, ...body],
+          widths: [...COLUMN_WIDTHS, ...extraKeys.map(() => 18)],
+        },
       ])
       setState({ busy: false, count: rows.length, done: true, error: false })
     } catch {

@@ -42,8 +42,8 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 7 terminada (unidades, presentaciones y kits). Propuestas sin pedir aún: 8 onboarding con Excel,
-  9 atajos, 10 seguridad (papelera, auditoría, respaldo).
+- Fase actual: 8 terminada (importar el Excel de cada empresa). Propuestas sin pedir aún: 9 atajos,
+  10 seguridad (papelera, auditoría, respaldo).
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
@@ -88,3 +88,12 @@ grandes, facilidad de uso y apariencia profesional.
   pueden armar), vender o recibir un kit mueve cada pieza; una pieza usada en un kit no se puede eliminar.
   Guardado atómico con `set_product_packages` y `set_kit_components`. Etiquetas por presentación; Excel con
   columnas Presentación y Contenido por presentación (importar y exportar).
+- Fase 8: migración `20261021000000_excel_de_cada_empresa.sql`: `products.extra` (jsonb, columnas del Excel que no son
+  un dato de la app, por título), `packages` por fila en `import_products` (vía `import_row_packages`) e
+  `import_formats` (por empresa y firma de títulos: hoja, fila de títulos, columnas, otros datos y opciones).
+  Asistente: lee todas las hojas y elige la de productos; detecta la fila de títulos (logo y fecha arriba); reconoce
+  títulos con prefijo de tabla de programas contables ("procod", "pronom"), abreviaturas ("Vr. unitario", "Cant.")
+  y evita "total", "IVA", "barras"; cifras con moneda, miles "1.500" y unidad ("12 und"); unidades `normalizeUnit`
+  ("MTR2" → m²); filas de categoría ("PINTURAS") y de totales; Caja y Pieza leídas del nombre en m²
+  ("30*60 - 1.62 - 9", comprobado con la medida de la pieza); "Otros datos" con nombre claro y visibles en la
+  ficha y en la exportación; corrección de errores en pantalla. Probado con un Excel real de 4.763 productos.

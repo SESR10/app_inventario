@@ -504,6 +504,26 @@ export function ProductFormPage() {
           />
         )}
 
+        {product?.extra && Object.keys(product.extra).length > 0 && (
+          <section
+            aria-labelledby="otros-datos"
+            className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4 shadow-sm sm:p-6"
+          >
+            <h2 id="otros-datos" className="text-lg font-semibold">
+              {t('products.extraTitle')}
+            </h2>
+            <p className="text-sm text-muted">{t('products.extraHint')}</p>
+            <dl className="grid gap-x-6 gap-y-2 sm:grid-cols-2">
+              {Object.entries(product.extra).map(([key, value]) => (
+                <div key={key} className="min-w-0">
+                  <dt className="text-sm text-muted">{key}</dt>
+                  <dd className="break-words">{typeof value === 'number' ? formatNumber(value) : value}</dd>
+                </div>
+              ))}
+            </dl>
+          </section>
+        )}
+
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           {editable && (
             <Button type="submit" busy={busy}>

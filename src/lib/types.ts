@@ -44,6 +44,8 @@ export interface Product {
   image_path: string | null
   // Kit: se arma con otras piezas; su stock es cuántos kits se pueden armar.
   is_kit: boolean
+  // Otras columnas del Excel de la empresa, guardadas por su título ("Marca": "Stanley").
+  extra?: Record<string, string | number>
 }
 
 // Presentación de un producto: cuántas unidades base trae (Caja = 1,44 m²).
@@ -65,7 +67,7 @@ export interface KitComponent {
 }
 
 // Al editar no se envía el stock: cambia solo con movimientos.
-export type ProductInput = Omit<Product, 'id' | 'company_id' | 'sku' | 'stock' | 'is_kit'> & {
+export type ProductInput = Omit<Product, 'id' | 'company_id' | 'sku' | 'stock' | 'is_kit' | 'extra'> & {
   sku: string | null
   stock?: number
   is_kit?: boolean
