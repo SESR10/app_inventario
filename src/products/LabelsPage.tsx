@@ -8,13 +8,23 @@ import { Checkbox } from '../components/ui/Checkbox'
 import { SelectField } from '../components/ui/SelectField'
 import { useSupabase } from '../lib/client-context'
 import { formatMoney } from '../lib/format'
-import type { Product } from '../lib/types'
-import { getProductsByIds, MAX_LABELS } from './api'
+import type { Product, ProductPackage } from '../lib/types'
+import { getProductsByIds, listPackagesOf, MAX_LABELS } from './api'
 import { Barcode, QrCode } from './codes'
+import { packageEquivalence } from './units'
 
 
 type CodeType = 'barcode' | 'qr' | 'both'
 type LabelProduct = Pick<Product, 'id' | 'sku' | 'name' | 'price' | 'unit'>
+
+// Una etiqueta: la del producto o la de una de sus presentaciones (caja, pieza…).
+interface Label {
+  key: string
+  name: string
+  detail: string | null
+  code: string
+  price: number
+}
 
 export function LabelsPage() {
   const { t } = useTranslation()
@@ -29,16 +39,32 @@ export function LabelsPage() {
   const [codeType, setCodeType] = useState<CodeType>('barcode')
   const [copies, setCopies] = useState(1)
   const [showPrice, setShowPrice] = useState(true)
+  const [packages, setPackages] = useState<(ProductPackage & { product_id: string })[]>([])
+  const [withPackages, setWithPackages] = useState(false)
 
   useEffect(() => {
     if (!idsKey) return
-    getProductsByIds(client, idsKey.split(','))
-      .then(setProducts)
+    Promise.all([getProductsByIds(client, idsKey.split(',')), listPackagesOf(client, idsKey.split(','))])
+      .then(([rows, pkgs]) => {
+        setProducts(rows)
+        setPackages(pkgs)
+      })
       .catch(() => setError(true))
       .finally(() => setLoading(false))
   }, [client, idsKey])
 
-  const labels = products.flatMap((p) => Array.from({ length: copies }, (_, i) => ({ product: p, key: `${p.id}-${i}` })))
+  const kinds: Label[] = products.flatMap((p) => [
+    { key: p.id, name: p.name, detail: null, code: p.sku, price: p.price },
+    ...(withPackages ? packages.filter((k) => k.product_id === p.id) : []).map((k) => ({
+      key: k.id,
+      name: p.name,
+      detail: `${k.name} · ${packageEquivalence(k, p.unit)}`,
+      code: k.barcode,
+      // Precio de la presentación: precio de la unidad base por lo que trae.
+      price: Math.round(p.price * k.factor * 100) / 100,
+    })),
+  ])
+  const labels = kinds.flatMap((label) => Array.from({ length: copies }, (_, i) => ({ ...label, key: `${label.key}-${i}` })))
 
   return (
     <section className="flex flex-col gap-5">
@@ -62,6 +88,14 @@ export function LabelsPage() {
             ))}
           </SelectField>
           <Checkbox label={t('labels.showPrice')} checked={showPrice} onChange={(e) => setShowPrice(e.target.checked)} />
+          {packages.length > 0 && (
+            <Checkbox
+              label={t('labels.withPackages', { count: packages.length })}
+              checked={withPackages}
+              onChange={(e) => setWithPackages(e.target.checked)}
+              className="sm:col-span-3"
+            />
+          )}
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -78,19 +112,20 @@ export function LabelsPage() {
         <p role="status">{t('app.loading')}</p>
       ) : (
         <ul className="grid grid-cols-[repeat(auto-fill,minmax(6.4cm,1fr))] gap-2 print:gap-1">
-          {labels.map(({ product, key }) => (
+          {labels.map(({ key, name, detail, code, price }) => (
             <li
               key={key}
               className="flex min-h-[3.4cm] break-inside-avoid flex-col justify-between gap-1 rounded border border-dashed border-slate-400 bg-white p-2 text-black"
             >
-              <p className="line-clamp-2 text-sm leading-tight font-semibold">{product.name}</p>
+              <p className="line-clamp-2 text-sm leading-tight font-semibold">{name}</p>
+              {detail && <p className="text-xs font-semibold">{detail}</p>}
               <div className="flex items-center justify-between gap-2">
-                {codeType !== 'qr' && <Barcode value={product.sku} label={t('labels.barcodeAlt', { sku: product.sku })} />}
-                {codeType !== 'barcode' && <QrCode value={product.sku} label={t('labels.qrAlt', { sku: product.sku })} />}
+                {codeType !== 'qr' && <Barcode value={code} label={t('labels.barcodeAlt', { sku: code })} />}
+                {codeType !== 'barcode' && <QrCode value={code} label={t('labels.qrAlt', { sku: code })} />}
               </div>
               <p className="flex justify-between text-xs">
-                <span className="font-mono">{product.sku}</span>
-                {showPrice && <span className="font-semibold">{formatMoney(product.price)}</span>}
+                <span className="font-mono">{code}</span>
+                {showPrice && <span className="font-semibold">{formatMoney(price)}</span>}
               </p>
             </li>
           ))}

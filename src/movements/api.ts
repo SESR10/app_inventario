@@ -31,19 +31,22 @@ export async function listMovements(
   return (data ?? []) as Movement[]
 }
 
-// Devuelve el stock nuevo. En un ajuste, quantity es el stock contado.
+// Devuelve el stock nuevo (en unidad base). En un ajuste, quantity es el stock contado.
+// quantity va en la presentación packageId (caja, pieza…) o, sin ella, en la unidad base.
 export async function recordMovement(
   client: SupabaseClient,
   productId: string,
   type: MovementType,
   quantity: number,
   reason: string,
+  packageId: string | null = null,
 ) {
   const { data, error } = await client.rpc('record_movement', {
     p_product: productId,
     p_type: type,
     p_quantity: quantity,
     p_reason: reason.trim() || null,
+    p_package: packageId,
   })
   if (error) throw error
   return Number(data)
@@ -52,3 +55,7 @@ export async function recordMovement(
 // Código del error de la base (hint), por ejemplo insufficient_stock.
 export const errorHint = (error: unknown) =>
   typeof error === 'object' && error !== null && 'hint' in error ? String(error.hint) : ''
+
+// Detalle del error de la base; en un kit sin stock suficiente, el nombre de la pieza que falta.
+export const errorDetail = (error: unknown) =>
+  typeof error === 'object' && error !== null && 'details' in error && error.details ? String(error.details) : ''

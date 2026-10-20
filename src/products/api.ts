@@ -1,5 +1,5 @@
 import type { SupabaseClient } from '@supabase/supabase-js'
-import type { CatalogItem, CatalogTable, Product, ProductInput, ProductRow } from '../lib/types'
+import type { CatalogItem, CatalogTable, KitComponent, Product, ProductInput, ProductPackage, ProductRow } from '../lib/types'
 
 export const PAGE_SIZE = 50
 export const IMAGE_BUCKET = 'product-images'
@@ -74,6 +74,73 @@ export async function saveProduct(client: SupabaseClient, companyId: string, inp
   return data as { id: string; sku: string }
 }
 
+export async function listPackages(client: SupabaseClient, productId: string) {
+  const { data, error } = await client
+    .from('product_packages')
+    .select('id, name, factor, barcode')
+    .eq('product_id', productId)
+    .order('factor')
+  if (error) throw error
+  return ((data ?? []) as ProductPackage[]).map((p) => ({ ...p, factor: Number(p.factor) }))
+}
+
+// Presentaciones de varios productos (para etiquetas).
+export async function listPackagesOf(client: SupabaseClient, productIds: string[]) {
+  const { data, error } = await client
+    .from('product_packages')
+    .select('id, product_id, name, factor, barcode')
+    .in('product_id', productIds)
+    .order('factor')
+  if (error) throw error
+  return ((data ?? []) as (ProductPackage & { product_id: string })[]).map((p) => ({ ...p, factor: Number(p.factor) }))
+}
+
+// Guarda la lista completa de presentaciones (las que faltan se borran). Sin id = nueva.
+export async function savePackages(
+  client: SupabaseClient,
+  productId: string,
+  packages: { id?: string; name: string; factor: number; barcode: string | null }[],
+) {
+  const { error } = await client.rpc('set_product_packages', { p_product: productId, p_packages: packages })
+  if (error) throw error
+}
+
+export async function listKitComponents(client: SupabaseClient, kitId: string): Promise<KitComponent[]> {
+  const { data, error } = await client.from('kit_components').select('component_id, quantity').eq('kit_id', kitId)
+  if (error) throw error
+  const rows = (data ?? []) as { component_id: string; quantity: number }[]
+  if (rows.length === 0) return []
+  const { data: products, error: productsError } = await client
+    .from('products')
+    .select('id, name, sku, unit, stock')
+    .in('id', rows.map((r) => r.component_id))
+  if (productsError) throw productsError
+  const byId = new Map(((products ?? []) as Pick<Product, 'id' | 'name' | 'sku' | 'unit' | 'stock'>[]).map((p) => [p.id, p]))
+  return rows
+    .filter((r) => byId.has(r.component_id))
+    .map((r) => {
+      const p = byId.get(r.component_id)!
+      return { component_id: r.component_id, quantity: Number(r.quantity), name: p.name, sku: p.sku, unit: p.unit, stock: Number(p.stock) }
+    })
+}
+
+export async function saveKitComponents(
+  client: SupabaseClient,
+  kitId: string,
+  components: { component_id: string; quantity: number }[],
+) {
+  const { error } = await client.rpc('set_kit_components', { p_kit: kitId, p_components: components })
+  if (error) throw error
+}
+
+// Producto (y presentación) de un código escaneado: SKU o código de una presentación.
+export async function findCode(client: SupabaseClient, companyId: string, code: string) {
+  const { data, error } = await client.rpc('find_code', { p_company: companyId, p_code: code })
+  if (error) throw error
+  const row = ((data ?? []) as { product_id: string; package_id: string | null }[])[0]
+  return row ?? null
+}
+
 export async function deleteProduct(client: SupabaseClient, product: Pick<Product, 'id' | 'image_path'>) {
   const { error } = await client.from('products').delete().eq('id', product.id)
   if (error) throw error
@@ -109,6 +176,10 @@ export async function imageUrl(client: SupabaseClient, path: string) {
   if (error) throw error
   return data.signedUrl
 }
+
+// Pieza que no se puede borrar porque está en un kit (clave foránea).
+export const isInUseError = (error: unknown) =>
+  typeof error === 'object' && error !== null && 'code' in error && error.code === '23503'
 
 // Código duplicado de Postgres: SKU repetido dentro de la empresa.
 export const isDuplicateError = (error: unknown) =>

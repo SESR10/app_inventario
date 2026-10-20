@@ -1,9 +1,12 @@
 // Columnas del archivo de productos, en el orden de la plantilla y la exportación.
-export const FIELDS = ['sku', 'name', 'category', 'unit', 'cost', 'price', 'stock', 'min_stock', 'location', 'supplier'] as const
+export const FIELDS = [
+  'sku', 'name', 'category', 'unit', 'cost', 'price', 'stock', 'min_stock', 'location', 'supplier',
+  'package_name', 'package_factor',
+] as const
 
 export type FieldKey = (typeof FIELDS)[number]
 
-export const NUMBER_FIELDS: readonly FieldKey[] = ['cost', 'price', 'stock', 'min_stock']
+export const NUMBER_FIELDS: readonly FieldKey[] = ['cost', 'price', 'stock', 'min_stock', 'package_factor']
 
 // Largo máximo de cada texto (igual que en la base de datos).
 export const MAX_LENGTH: Partial<Record<FieldKey, number>> = {
@@ -13,6 +16,7 @@ export const MAX_LENGTH: Partial<Record<FieldKey, number>> = {
   unit: 40,
   location: 80,
   supplier: 120,
+  package_name: 40,
 }
 
 // Nombres de columna que se reconocen solos al mapear (sin tildes, espacios ni mayúsculas).
@@ -27,6 +31,11 @@ const SYNONYMS: Record<FieldKey, string[]> = {
   min_stock: ['stockminimo', 'minimo', 'min', 'minstock', 'stockmin', 'cantidadminima'],
   location: ['ubicacion', 'location', 'bodega', 'almacen', 'estante'],
   supplier: ['proveedor', 'supplier', 'vendor', 'fabricante'],
+  package_name: ['presentacion', 'empaque', 'embalaje', 'package', 'packaging'],
+  package_factor: [
+    'contenidoporpresentacion', 'contenido', 'contenidoporcaja', 'unidadesporcaja', 'cantidadporcaja',
+    'unidadesporempaque', 'factor', 'equivalencia',
+  ],
 }
 
 export const normalizeHeader = (text: string) =>

@@ -7,19 +7,19 @@ import type { AppRole, Movement, ProductRow } from '../lib/types'
 import { fakeClient } from '../test/fakeClient'
 
 const rows: ProductRow[] = [
-  { id: 'p1', sku: 'P-000001', name: 'Martillo', unit: 'unidad', price: 25000, stock: 2, min_stock: 5, category_name: null, location_name: null },
-  { id: 'p2', sku: 'P-000002', name: 'Tornillo', unit: 'caja', price: 1200, stock: 40, min_stock: 10, category_name: null, location_name: null },
+  { id: 'p1', sku: 'P-000001', name: 'Martillo', unit: 'unidad', price: 25000, stock: 2, min_stock: 5, is_kit: false, category_name: null, location_name: null },
+  { id: 'p2', sku: 'P-000002', name: 'Tornillo', unit: 'caja', price: 1200, stock: 40, min_stock: 10, is_kit: false, category_name: null, location_name: null },
 ]
 
 const product = {
   id: 'p1', company_id: 'c1', sku: 'P-000001', name: 'Martillo', unit: 'unidad', cost: 18000, price: 25000,
-  stock: 2, min_stock: 5, category_id: null, location_id: null, supplier_id: null, image_path: null,
+  stock: 2, min_stock: 5, category_id: null, location_id: null, supplier_id: null, image_path: null, is_kit: false,
 }
 
 const history: Movement[] = [
-  { id: 3, created_at: '2026-10-19T15:30:00Z', type: 'out', quantity: -8, stock_after: 2, reason: 'Venta factura 12', product_id: 'p1', product_name: 'Martillo', product_sku: 'P-000001', unit: 'unidad', user_email: 'ana@empresa.com' },
-  { id: 2, created_at: '2026-10-18T10:00:00Z', type: 'in', quantity: 6, stock_after: 10, reason: '@import', product_id: 'p1', product_name: 'Martillo', product_sku: 'P-000001', unit: 'unidad', user_email: null },
-  { id: 1, created_at: '2026-10-17T09:00:00Z', type: 'adjust', quantity: 4, stock_after: 4, reason: null, product_id: 'p2', product_name: 'Tornillo', product_sku: 'P-000002', unit: 'caja', user_email: 'beto@empresa.com' },
+  { id: 3, created_at: '2026-10-19T15:30:00Z', type: 'out', quantity: -8, stock_after: 2, reason: 'Venta factura 12', package_name: null, package_qty: null, kit_name: null, kit_qty: null, product_id: 'p1', product_name: 'Martillo', product_sku: 'P-000001', unit: 'unidad', user_email: 'ana@empresa.com' },
+  { id: 2, created_at: '2026-10-18T10:00:00Z', type: 'in', quantity: 6, stock_after: 10, reason: '@import', package_name: null, package_qty: null, kit_name: null, kit_qty: null, product_id: 'p1', product_name: 'Martillo', product_sku: 'P-000001', unit: 'unidad', user_email: null },
+  { id: 1, created_at: '2026-10-17T09:00:00Z', type: 'adjust', quantity: 4, stock_after: 4, reason: null, package_name: null, package_qty: null, kit_name: null, kit_qty: null, product_id: 'p2', product_name: 'Tornillo', product_sku: 'P-000002', unit: 'caja', user_email: 'beto@empresa.com' },
 ]
 
 function setup(path: string, role: AppRole = 'editor', extra: Record<string, (args: Record<string, unknown>) => unknown> = {}) {
@@ -70,7 +70,7 @@ describe('Registrar movimientos', () => {
 
     expect(await screen.findByText('Listo: Tornillo quedó con 35 caja.')).toBeInTheDocument()
     expect(client.rpc).toHaveBeenCalledWith('record_movement', {
-      p_product: 'p2', p_type: 'out', p_quantity: 5, p_reason: 'Venta mostrador',
+      p_product: 'p2', p_type: 'out', p_quantity: 5, p_reason: 'Venta mostrador', p_package: null,
     })
     // Listo para el siguiente producto.
     await waitFor(() => expect(screen.getByLabelText('Buscar producto')).toHaveFocus())
