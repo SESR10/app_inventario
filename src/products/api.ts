@@ -147,6 +147,49 @@ export async function deleteProduct(client: SupabaseClient, product: Pick<Produc
   if (product.image_path) await client.storage.from(IMAGE_BUCKET).remove([product.image_path])
 }
 
+// Qué borrar: productos elegidos, los creados en una importación o todos los que coinciden con los filtros.
+export type DeleteTarget = { ids: string[] } | { importId: string } | { filters: ProductFilters }
+
+const DELETE_BATCH = 1000
+const IMAGE_BATCH = 100
+
+// Borra en lotes de 1000 y avisa el avance. Las piezas que usa un kit que se queda no se borran (inKit).
+export async function deleteProducts(
+  client: SupabaseClient,
+  companyId: string,
+  target: DeleteTarget,
+  onProgress: (deleted: number) => void = () => {},
+) {
+  let deleted = 0
+  let inKit = 0
+  const images: string[] = []
+  const run = async (params: Record<string, unknown>) => {
+    const { data, error } = await client.rpc('delete_products', { p_company: companyId, ...params })
+    if (error) throw error
+    const result = data as { deleted: number; in_kit: number; images: string[] }
+    deleted += result.deleted
+    inKit += result.in_kit
+    images.push(...result.images)
+    onProgress(deleted)
+    return result
+  }
+  if ('ids' in target) {
+    for (let i = 0; i < target.ids.length; i += DELETE_BATCH) await run({ p_ids: target.ids.slice(i, i + DELETE_BATCH) })
+  } else {
+    const params = 'importId' in target ? { p_import: target.importId } : filterParams(companyId, target.filters)
+    for (;;) {
+      const result = await run(params)
+      if (result.deleted < DELETE_BATCH) break
+    }
+    // Lo que quedó de la lista son piezas de kits que no se borraron.
+    if ('filters' in target) inKit = await countProducts(client, companyId, target.filters)
+  }
+  for (let i = 0; i < images.length; i += IMAGE_BATCH) {
+    await client.storage.from(IMAGE_BUCKET).remove(images.slice(i, i + IMAGE_BATCH))
+  }
+  return { deleted, inKit }
+}
+
 export async function listCatalog(client: SupabaseClient, table: CatalogTable, companyId: string) {
   const { data, error } = await client.from(table).select('id, name').eq('company_id', companyId).order('name')
   if (error) throw error

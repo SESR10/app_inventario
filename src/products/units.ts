@@ -35,3 +35,44 @@ export function stockBreakdown(stock: number, packages: Pick<ProductPackage, 'na
   if (rest > 0) parts.push(`${formatNumber(rest / 1000)} ${unit}`)
   return parts.length > 0 ? parts : null
 }
+
+// Cómo suelen escribirse las unidades en los Excel y programas contables ("MTR2", "UND", "KGS").
+const UNIT_ALIASES: Record<string, string> = Object.fromEntries(
+  (
+    [
+      ['unidad', 'u un und unid unidad unidades ud uds'],
+      ['m²', 'm2 mt2 mtr2 mts2 mtrs2 metro2 metrocuadrado metroscuadrados'],
+      ['m³', 'm3 mt3 mtr3 mts3 metro3 metrocubico metroscubicos'],
+      ['m', 'm mt mtr mts metro metros'],
+      ['cm', 'cm centimetro centimetros'],
+      ['mm', 'mm milimetro milimetros'],
+      ['kg', 'kg kgs kilo kilos kilogramo kilogramos'],
+      ['g', 'g gr grs gramo gramos'],
+      ['lb', 'lb lbs libra libras'],
+      ['t', 't ton tonelada toneladas'],
+      ['L', 'l lt lts litro litros'],
+      ['mL', 'ml mililitro mililitros'],
+      ['galón', 'gl gal galon galones'],
+      ['par', 'par pares'],
+      ['docena', 'dz doc docena docenas'],
+      ['juego', 'jgo juego juegos'],
+      ['caja', 'cj cja caja cajas'],
+      ['paquete', 'paq pqt paquete paquetes'],
+      ['bulto', 'blt bulto bultos'],
+      ['rollo', 'rll rollo rollos'],
+    ] as const
+  ).flatMap(([unit, aliases]) => aliases.split(' ').map((alias) => [alias, unit])),
+)
+
+// Lleva una unidad escrita de cualquier forma a la de la app: "MTR2" → "m²", "KGS" → "kg".
+// Las que no conoce quedan como están, en minúscula si venían en mayúscula ("KIT" → "kit").
+export function normalizeUnit(text: string) {
+  const key = text
+    .normalize('NFD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/²/g, '2')
+    .replace(/³/g, '3')
+    .replace(/[^a-z0-9]/g, '')
+  return UNIT_ALIASES[key] ?? (text === text.toUpperCase() ? text.toLowerCase() : text)
+}

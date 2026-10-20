@@ -29,7 +29,7 @@ export function fakeClient({ signedIn = false, memberships = [], tables = {}, rp
       if (op !== 'select') writes.push({ table, op, payload, filters })
       if (op === 'insert') return { data: { id: 'nuevo', ...payload, sku: payload?.sku ?? 'P-000001' }, error: null }
       if (op === 'update') return { data: { id: filters[0]?.[1], ...payload }, error: null }
-      if (op === 'delete') return { data: null, error: null }
+      if (op === 'delete' || op === 'upsert') return { data: null, error: null }
       const matching = rows.filter((r) =>
         filters.every(([col, val]) => !(col in r) || (Array.isArray(val) ? val.includes(r[col]) : r[col] === val)),
       )
@@ -43,6 +43,7 @@ export function fakeClient({ signedIn = false, memberships = [], tables = {}, rp
       in: (col: string, val: unknown[]) => (filters.push([col, val]), builder),
       insert: (row: Row) => ((op = 'insert'), (payload = row), builder),
       update: (row: Row) => ((op = 'update'), (payload = row), builder),
+      upsert: (row: Row) => ((op = 'upsert'), (payload = row), builder),
       delete: () => ((op = 'delete'), builder),
       single: () => ((single = true), builder),
       maybeSingle: () => ((single = true), builder),

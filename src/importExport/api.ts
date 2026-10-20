@@ -30,11 +30,14 @@ export async function importBatch(
   companyId: string,
   rows: ImportRecord[],
   updateExisting: boolean,
+  // Marca los productos nuevos para poder deshacer la importación.
+  importId: string | null = null,
 ): Promise<ImportResult> {
   const { data, error } = await client.rpc('import_products', {
     p_company: companyId,
     p_rows: rows,
     p_update_existing: updateExisting,
+    p_import: importId,
   })
   if (error) throw error
   return data as ImportResult
@@ -54,6 +57,7 @@ export interface ExportRow {
   supplier: string | null
   package_name: string | null
   package_factor: number | null
+  extra?: Record<string, string | number> | null
 }
 
 // Trae todos los productos por páginas (cursor nombre + id).
@@ -74,4 +78,35 @@ export async function exportAll(client: SupabaseClient, companyId: string, onPro
     if (page.length < EXPORT_PAGE) return all
     last = page[page.length - 1]
   }
+}
+
+// Formato de Excel recordado por empresa: qué columna es cuál, identificado por sus títulos.
+export interface SavedFormat {
+  sheet: string
+  headerRow: number
+  // Dato de la app → título de la columna en el archivo.
+  mapping: Record<string, string>
+  // Columnas guardadas como "Otros datos" y con qué nombre.
+  extra: { column: string; as: string }[]
+  updateExisting: boolean
+  categoryRows: boolean
+  boxFromName: boolean
+}
+
+export async function loadFormat(client: SupabaseClient, companyId: string, signature: string) {
+  const { data, error } = await client
+    .from('import_formats')
+    .select('settings')
+    .eq('company_id', companyId)
+    .eq('signature', signature)
+    .maybeSingle()
+  if (error) throw error
+  return ((data as { settings: SavedFormat } | null)?.settings ?? null)
+}
+
+export async function saveFormat(client: SupabaseClient, companyId: string, signature: string, settings: SavedFormat) {
+  const { error } = await client
+    .from('import_formats')
+    .upsert({ company_id: companyId, signature, settings, updated_at: new Date().toISOString() })
+  if (error) throw error
 }
