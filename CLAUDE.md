@@ -42,7 +42,8 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
-- Fase actual: 6 terminada (publicación en Vercel). Las fases 1 a 4 del plan original están completas.
+- Fase actual: 7 terminada (unidades, presentaciones y kits). Propuestas sin pedir aún: 8 onboarding con Excel,
+  9 atajos, 10 seguridad (papelera, auditoría, respaldo).
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
@@ -79,3 +80,11 @@ grandes, facilidad de uso y apariencia profesional.
   el registro manda `emailRedirectTo: window.location.origin`. En Vercel van `VITE_SUPABASE_URL` y
   `VITE_SUPABASE_ANON_KEY`; en Supabase (Authentication > URL Configuration), Site URL = dirección de Vercel
   y `http://localhost:5173` en Redirect URLs.
+- Fase 7: migración `20261020000000_unidades_presentaciones_kits.sql`. Stock en la unidad base (`products.unit`,
+  decimales con 3 cifras); `UnitField` con unidades agrupadas (conteo, longitud, área, volumen, peso) u otra.
+  `product_packages` (nombre, factor = unidades base por empaque, código de barras propio, autogenerado `SKU-n`);
+  `record_movement(..., p_package)` convierte y guarda la presentación en el historial; `find_code` resuelve SKU o
+  código de presentación al escanear. Kits (`is_kit`, `kit_components`): su stock lo calcula un trigger (cuántos se
+  pueden armar), vender o recibir un kit mueve cada pieza; una pieza usada en un kit no se puede eliminar.
+  Guardado atómico con `set_product_packages` y `set_kit_components`. Etiquetas por presentación; Excel con
+  columnas Presentación y Contenido por presentación (importar y exportar).

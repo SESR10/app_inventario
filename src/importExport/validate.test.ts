@@ -12,6 +12,11 @@ describe('guessMapping', () => {
     const mapping = guessMapping(['Nombre del producto', 'Precio de compra', 'Precio unitario', 'Cantidad en bodega'])
     expect(mapping).toMatchObject({ name: 0, cost: 1, price: 2, stock: 3, location: null })
   })
+
+  it('reconoce la presentación y su contenido', () => {
+    const mapping = guessMapping(['Nombre', 'Unidad', 'Presentación', 'Contenido por presentación'])
+    expect(mapping).toMatchObject({ name: 0, unit: 1, package_name: 2, package_factor: 3 })
+  })
 })
 
 describe('reviewRows', () => {
@@ -48,6 +53,22 @@ describe('reviewRows', () => {
   it('marca textos demasiado largos', () => {
     const review = reviewRows([['', 'x'.repeat(201), 1, 1]], mapping, new Set(), true)
     expect(review.issues[0]).toMatchObject({ field: 'name', problem: 'tooLong' })
+  })
+
+  it('pide la presentación completa: nombre y contenido mayor que 0', () => {
+    const withPackage = guessMapping(['Nombre', 'Presentación', 'Contenido por presentación'])
+    const review = reviewRows(
+      [['Enchape', 'Caja', '1,44'], ['Baldosa', 'Caja', ''], ['Piso', '', 2], ['Muro', 'Caja', 0]],
+      withPackage,
+      new Set(),
+      true,
+    )
+    expect(review.toCreate[0]).toMatchObject({ package_name: 'Caja', package_factor: 1.44 })
+    expect(review.issues).toEqual([
+      { row: 3, field: 'package_factor', problem: 'packageIncomplete', value: '' },
+      { row: 4, field: 'package_name', problem: 'packageIncomplete', value: '' },
+      { row: 5, field: 'package_factor', problem: 'positive', value: '0' },
+    ])
   })
 
   it('lista los SKU sin repetir para consultarlos', () => {

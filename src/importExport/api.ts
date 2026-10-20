@@ -52,6 +52,8 @@ export interface ExportRow {
   min_stock: number
   location: string | null
   supplier: string | null
+  package_name: string | null
+  package_factor: number | null
 }
 
 // Trae todos los productos por páginas (cursor nombre + id).

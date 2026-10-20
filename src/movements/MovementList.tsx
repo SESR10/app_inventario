@@ -26,6 +26,9 @@ export function MovementList({ rows, label }: { rows: Movement[]; label: string 
             </Link>
             <span className="text-sm text-muted"> · {m.product_sku}</span>
             <p className="text-sm">{reasonText(t, m.reason)}</p>
+            {m.kit_name && (
+              <p className="text-sm">{t('movements.fromKit', { name: m.kit_name, count: Number(m.kit_qty) })}</p>
+            )}
             <p className="text-sm break-words text-muted">
               {m.user_email ? t('movements.by', { email: m.user_email }) : t('movements.byUnknown')}
             </p>
@@ -35,6 +38,11 @@ export function MovementList({ rows, label }: { rows: Movement[]; label: string 
               <span className="sr-only">{t('movements.quantity')}: </span>
               {formatQuantity(m.quantity)} {m.unit}
             </p>
+            {m.package_name && m.package_qty !== null && (
+              <p className="text-muted">
+                {t('movements.inPackage', { qty: formatNumber(Number(m.package_qty)), name: m.package_name })}
+              </p>
+            )}
             <p className="text-muted">{t('movements.stockAfter', { stock: formatNumber(m.stock_after), unit: m.unit })}</p>
           </div>
         </li>

@@ -23,6 +23,7 @@ export interface ProductRow {
   price: number
   stock: number
   min_stock: number
+  is_kit: boolean
   category_name: string | null
   location_name: string | null
 }
@@ -41,10 +42,34 @@ export interface Product {
   location_id: string | null
   supplier_id: string | null
   image_path: string | null
+  // Kit: se arma con otras piezas; su stock es cuántos kits se pueden armar.
+  is_kit: boolean
+}
+
+// Presentación de un producto: cuántas unidades base trae (Caja = 1,44 m²).
+export interface ProductPackage {
+  id: string
+  name: string
+  factor: number
+  barcode: string
+}
+
+// Pieza de un kit, con los datos del producto para mostrarla.
+export interface KitComponent {
+  component_id: string
+  quantity: number
+  name: string
+  sku: string
+  unit: string
+  stock: number
 }
 
 // Al editar no se envía el stock: cambia solo con movimientos.
-export type ProductInput = Omit<Product, 'id' | 'company_id' | 'sku' | 'stock'> & { sku: string | null; stock?: number }
+export type ProductInput = Omit<Product, 'id' | 'company_id' | 'sku' | 'stock' | 'is_kit'> & {
+  sku: string | null
+  stock?: number
+  is_kit?: boolean
+}
 
 export const isLowStock = (p: { stock: number; min_stock: number }) => p.min_stock > 0 && p.stock <= p.min_stock
 
@@ -58,6 +83,11 @@ export interface Movement {
   quantity: number
   stock_after: number
   reason: string | null
+  // Presentación en que se registró ("10 Caja") y kit del que vino, si aplica.
+  package_name: string | null
+  package_qty: number | null
+  kit_name: string | null
+  kit_qty: number | null
   product_id: string
   product_name: string
   product_sku: string

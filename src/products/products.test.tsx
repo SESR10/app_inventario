@@ -7,13 +7,13 @@ import type { AppRole, ProductRow } from '../lib/types'
 import { fakeClient } from '../test/fakeClient'
 
 const rows: ProductRow[] = [
-  { id: 'p1', sku: 'P-000001', name: 'Martillo', unit: 'unidad', price: 25000, stock: 2, min_stock: 5, category_name: 'Herramientas', location_name: 'Bodega' },
-  { id: 'p2', sku: 'P-000002', name: 'Tornillo', unit: 'caja', price: 1200.5, stock: 40, min_stock: 10, category_name: null, location_name: null },
+  { id: 'p1', sku: 'P-000001', name: 'Martillo', unit: 'unidad', price: 25000, stock: 2, min_stock: 5, is_kit: false, category_name: 'Herramientas', location_name: 'Bodega' },
+  { id: 'p2', sku: 'P-000002', name: 'Tornillo', unit: 'caja', price: 1200.5, stock: 40, min_stock: 10, is_kit: false, category_name: null, location_name: null },
 ]
 
 const product = {
   id: 'p1', company_id: 'c1', sku: 'P-000001', name: 'Martillo', unit: 'unidad', cost: 18000, price: 25000,
-  stock: 2, min_stock: 5, category_id: 'cat1', location_id: null, supplier_id: null, image_path: 'c1/foto.png',
+  stock: 2, min_stock: 5, category_id: 'cat1', location_id: null, supplier_id: null, image_path: 'c1/foto.png', is_kit: false,
 }
 
 function setup(path: string, role: AppRole = 'admin') {

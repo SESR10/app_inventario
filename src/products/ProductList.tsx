@@ -80,6 +80,11 @@ export function ProductList({ rows, total, hasMore, loading, selected, onToggle,
                       <Link to={`/productos/${row.id}`} className="font-semibold text-brand-700 underline-offset-2 hover:underline">
                         {row.name}
                       </Link>
+                      {row.is_kit && (
+                        <span className="ml-2 rounded bg-brand-100 px-1.5 py-0.5 text-xs font-semibold text-brand-800">
+                          {t('kits.badge')}
+                        </span>
+                      )}
                       <p className="truncate text-sm text-muted">
                         {row.sku}
                         {row.category_name && ` · ${row.category_name}`}
@@ -89,7 +94,7 @@ export function ProductList({ rows, total, hasMore, loading, selected, onToggle,
                     <p className="text-sm sm:w-60 sm:text-right">
                       <span className="text-muted">{t('products.stockLabel')}: </span>
                       <span className="font-medium">
-                        {formatNumber(row.stock)} {row.unit}
+                        {row.is_kit ? t('kits.availableShort', { count: Number(row.stock) }) : `${formatNumber(row.stock)} ${row.unit}`}
                       </span>
                       {low && (
                         <span className="ml-2 whitespace-nowrap rounded bg-red-50 px-1.5 py-0.5 text-xs font-semibold text-danger">

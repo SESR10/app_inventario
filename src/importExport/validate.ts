@@ -2,7 +2,7 @@ import { parseNumber } from '../lib/format'
 import { FIELDS, MAX_LENGTH, NUMBER_FIELDS, type FieldKey, type Mapping } from './fields'
 import type { Cell } from './sheet'
 
-export type Problem = 'nameRequired' | 'number' | 'negative' | 'tooLong' | 'duplicateInFile'
+export type Problem = 'nameRequired' | 'number' | 'negative' | 'tooLong' | 'duplicateInFile' | 'packageIncomplete' | 'positive'
 
 export interface Issue {
   // Número de fila tal como se ve en Excel (la fila 1 son los títulos).
@@ -78,6 +78,12 @@ export function reviewRows(rows: Cell[][], mapping: Mapping, existing: Set<strin
     const exists = sku !== null && existing.has(sku)
     // Un producto nuevo necesita nombre; uno existente puede actualizarse solo con algunas columnas.
     if (!exists && !record.name) issues.push({ row, field: 'name', problem: 'nameRequired', value: '' })
+    // Presentación: nombre y contenido van juntos, y el contenido es mayor que 0.
+    if (record.package_factor === 0) issues.push({ row, field: 'package_factor', problem: 'positive', value: '0' })
+    else if (!record.package_name !== (record.package_factor === null)) {
+      const field = record.package_name ? 'package_factor' : 'package_name'
+      issues.push({ row, field, problem: 'packageIncomplete', value: '' })
+    }
 
     if (issues.length > 0) {
       review.issues.push(...issues)

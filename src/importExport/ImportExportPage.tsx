@@ -11,7 +11,7 @@ import { FIELDS } from './fields'
 import { ImportWizard } from './ImportWizard'
 import { downloadWorkbook, today, type Cell } from './sheet'
 
-const COLUMN_WIDTHS = [14, 40, 20, 12, 12, 12, 10, 14, 20, 24]
+const COLUMN_WIDTHS = [14, 40, 20, 12, 12, 12, 10, 14, 20, 24, 16, 16]
 
 export function ImportExportPage() {
   const { t } = useTranslation()
@@ -65,6 +65,7 @@ function ExportCard() {
       const header = FIELDS.map((f) => t(`importExport.columns.${f}`))
       const body: Cell[][] = rows.map((r) => [
         r.sku, r.name, r.category, r.unit, r.cost, r.price, r.stock, r.min_stock, r.location, r.supplier,
+        r.package_name, r.package_factor,
       ])
       await downloadWorkbook(`${t('importExport.files.products')}-${today()}.xlsx`, [
         { name: t('importExport.files.productsSheet'), rows: [header, ...body], widths: COLUMN_WIDTHS },
@@ -95,7 +96,9 @@ function TemplateCard() {
   function handleTemplate() {
     const header = FIELDS.map((f) => t(`importExport.columns.${f}`))
     const ex = (key: string) => t(`importExport.example.${key}`)
-    const example: Cell[] = ['', ex('name'), ex('category'), ex('unit'), 18000, 25000, 10, 3, ex('location'), ex('supplier')]
+    const example: Cell[] = [
+      '', ex('name'), ex('category'), ex('unit'), 18000, 25000, 10, 3, ex('location'), ex('supplier'), ex('package'), 12,
+    ]
     const instructions = (t('importExport.instructions', { returnObjects: true }) as string[]).map((line) => [line])
     void downloadWorkbook(`${t('importExport.files.template')}.xlsx`, [
       { name: t('importExport.files.productsSheet'), rows: [header, example], widths: COLUMN_WIDTHS },

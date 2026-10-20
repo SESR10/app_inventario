@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
 import { useCompany } from '../company/context'
 import { PageHeading } from '../components/PageHeading'
 import { Alert } from '../components/ui/Alert'
@@ -9,7 +9,7 @@ import { ConfirmDialog } from '../components/ui/ConfirmDialog'
 import { TextField } from '../components/ui/TextField'
 import { useSupabase } from '../lib/client-context'
 import { formatNumber, parseNumber } from '../lib/format'
-import { canEdit, type Product } from '../lib/types'
+import { canEdit, type Product, type ProductPackage } from '../lib/types'
 import { CatalogField } from './CatalogField'
 import {
   deleteProduct,
@@ -17,10 +17,19 @@ import {
   IMAGE_BUCKET,
   imageUrl,
   isDuplicateError,
+  isInUseError,
+  listKitComponents,
+  listPackages,
   MAX_IMAGE_BYTES,
+  saveKitComponents,
+  savePackages,
   saveProduct,
   uploadImage,
 } from './api'
+import { KitEditor, type ComponentDraft } from './KitEditor'
+import { PackagesEditor, type PackageDraft, type PackageErrors } from './PackagesEditor'
+import { UnitField } from './UnitField'
+import { stockBreakdown } from './units'
 import { useCatalogs } from './useCatalogs'
 
 const IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp']
@@ -40,6 +49,14 @@ interface FormState {
 }
 
 type FieldErrors = Partial<Record<keyof FormState | 'image', string>>
+
+const toDraft = (p: ProductPackage): PackageDraft => ({
+  key: p.id,
+  id: p.id,
+  name: p.name,
+  factor: String(p.factor),
+  barcode: p.barcode,
+})
 
 const blank: FormState = {
   name: '',
@@ -73,6 +90,7 @@ export function ProductFormPage() {
   const { t } = useTranslation()
   const client = useSupabase()
   const navigate = useNavigate()
+  const location = useLocation()
   const { current } = useCompany()
   const companyId = current!.company.id
   const editable = canEdit(current?.role)
@@ -82,8 +100,15 @@ export function ProductFormPage() {
   const [loading, setLoading] = useState(!isNew)
   const [notFound, setNotFound] = useState(false)
   const [form, setForm] = useState<FormState>(blank)
+  const [isKit, setIsKit] = useState(false)
+  const [packages, setPackages] = useState<PackageDraft[]>([])
+  const [savedPackages, setSavedPackages] = useState<ProductPackage[]>([])
+  const [components, setComponents] = useState<ComponentDraft[]>([])
   const [errors, setErrors] = useState<FieldErrors>({})
-  const [formError, setFormError] = useState<string | null>(null)
+  const [packageErrors, setPackageErrors] = useState<PackageErrors>({})
+  const [componentErrors, setComponentErrors] = useState<Record<string, string>>({})
+  // Si el producto se creó pero sus presentaciones o piezas no, se llega aquí con el aviso.
+  const [formError, setFormError] = useState<string | null>((location.state as { error?: string } | null)?.error ?? null)
   const [busy, setBusy] = useState(false)
   const [newImage, setNewImage] = useState<File | null>(null)
   const [removeImage, setRemoveImage] = useState(false)
@@ -96,10 +121,24 @@ export function ProductFormPage() {
     if (!id) return
     getProduct(client, id)
       .then((p) => {
-        if (!p) return setNotFound(true)
+        if (!p) {
+          setNotFound(true)
+          return
+        }
         setProduct(p)
         setForm(toForm(p))
-        if (p.image_path) return imageUrl(client, p.image_path).then(setImageSrc)
+        setIsKit(p.is_kit)
+        return Promise.all([
+          p.is_kit
+            ? listKitComponents(client, p.id).then((rows) =>
+                setComponents(rows.map((c) => ({ ...c, quantity: String(c.quantity) }))),
+              )
+            : listPackages(client, p.id).then((rows) => {
+                setSavedPackages(rows)
+                setPackages(rows.map(toDraft))
+              }),
+          p.image_path ? imageUrl(client, p.image_path).then(setImageSrc) : null,
+        ])
       })
       .catch(() => setNotFound(true))
       .finally(() => setLoading(false))
@@ -119,14 +158,46 @@ export function ProductFormPage() {
     const next: FieldErrors = {}
     if (!form.name.trim()) next.name = t('products.errors.nameRequired')
     for (const field of NUMBER_FIELDS) {
-      // Al editar, el stock solo cambia con movimientos.
-      if (field === 'stock' && !isNew) continue
+      // Al editar, el stock solo cambia con movimientos; un kit no tiene stock propio.
+      if (field === 'stock' && (!isNew || isKit)) continue
       const value = parseNumber(form[field])
       if (value === null) next[field] = t('products.errors.number')
       else if (value < 0) next[field] = t('products.errors.negative')
     }
+    if (!form.unit.trim()) next.unit = t('units.required')
+
+    const pkgErrors: PackageErrors = {}
+    const names = new Set<string>()
+    if (!isKit) {
+      for (const pkg of packages) {
+        const name = pkg.name.trim().toLowerCase()
+        const factor = parseNumber(pkg.factor)
+        const e: PackageErrors[string] = {}
+        if (!name) e.name = t('packages.errors.name')
+        else if (names.has(name)) e.name = t('packages.errors.duplicate')
+        if (factor === null || factor <= 0) e.factor = t('packages.errors.factor')
+        if (e.name || e.factor) pkgErrors[pkg.key] = e
+        names.add(name)
+      }
+    }
+    const kitErrors: Record<string, string> = {}
+    if (isKit) {
+      if (components.length === 0) kitErrors.list = t('kits.errors.empty')
+      for (const c of components) {
+        const qty = parseNumber(c.quantity)
+        if (qty === null || qty <= 0) kitErrors[c.component_id] = t('kits.errors.quantity')
+      }
+    }
+
     setErrors(next)
-    return next
+    setPackageErrors(pkgErrors)
+    setComponentErrors(kitErrors)
+    // Nombres de los campos con error, en el orden en que aparecen en la pantalla.
+    return [
+      ...Object.keys(next),
+      ...Object.entries(pkgErrors).map(([key, e]) => (e.name ? `package-name-${key}` : `package-factor-${key}`)),
+      ...Object.keys(kitErrors).map((key) => (key === 'list' ? 'kitPiece' : `kit-qty-${key}`)),
+    ]
   }
 
   function onPickImage(file: File | undefined) {
@@ -142,10 +213,9 @@ export function ProductFormPage() {
     event.preventDefault()
     setFormError(null)
     const found = validate()
-    if (Object.keys(found).length > 0) {
+    if (found.length > 0) {
       // Lleva el foco al primer campo con error.
-      const first = Object.keys(found)[0]
-      document.querySelector<HTMLElement>(`[name="${first}"]`)?.focus()
+      document.querySelector<HTMLElement>(`[name="${found[0]}"]`)?.focus()
       return
     }
 
@@ -163,7 +233,7 @@ export function ProductFormPage() {
           unit: form.unit.trim() || 'unidad',
           cost: parseNumber(form.cost)!,
           price: parseNumber(form.price)!,
-          ...(isNew && { stock: parseNumber(form.stock)! }),
+          ...(isNew && { is_kit: isKit, stock: isKit ? 0 : parseNumber(form.stock)! }),
           min_stock: parseNumber(form.minStock)!,
           category_id: form.categoryId || null,
           location_id: form.locationId || null,
@@ -176,6 +246,35 @@ export function ProductFormPage() {
       // La imagen anterior ya no se usa.
       if (product?.image_path && product.image_path !== imagePath) {
         await client.storage.from(IMAGE_BUCKET).remove([product.image_path])
+      }
+
+      try {
+        if (isKit) {
+          await saveKitComponents(
+            client,
+            saved.id,
+            components.map((c) => ({ component_id: c.component_id, quantity: parseNumber(c.quantity)! })),
+          )
+        } else if (!isNew || packages.length > 0) {
+          await savePackages(
+            client,
+            saved.id,
+            packages.map((p) => ({
+              ...(p.id && { id: p.id }),
+              name: p.name.trim(),
+              factor: parseNumber(p.factor)!,
+              barcode: p.barcode.trim() || null,
+            })),
+          )
+        }
+      } catch (err) {
+        const message = isDuplicateError(err) ? t('packages.errors.barcodeTaken') : t('products.errors.saveExtras')
+        // El producto ya existe: se sigue editando ese, no se crea otro.
+        if (isNew) return navigate(`/productos/${saved.id}`, { replace: true, state: { error: message } })
+        setFormError(message)
+        errorSummaryRef.current?.focus()
+        setBusy(false)
+        return
       }
 
       navigate('/productos', {
@@ -199,13 +298,14 @@ export function ProductFormPage() {
     try {
       await deleteProduct(client, product)
       navigate('/productos', { state: { notice: t('products.deleted', { name: product.name }) } })
-    } catch {
+    } catch (err) {
       setConfirmOpen(false)
-      setFormError(t('products.errors.delete'))
+      setFormError(isInUseError(err) ? t('products.errors.inKit') : t('products.errors.delete'))
       setBusy(false)
     }
   }
 
+  const breakdown = product && !isKit ? stockBreakdown(Number(product.stock), savedPackages, product.unit) : null
   const title = isNew ? t('products.new') : (product?.name ?? t('products.edit'))
 
   if (loading) return <p role="status">{t('app.loading')}</p>
@@ -229,6 +329,34 @@ export function ProductFormPage() {
       </div>
 
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
+        {isNew && (
+          <fieldset className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4 shadow-sm">
+            <legend className="float-left mb-1 font-semibold">{t('kits.typeLegend')}</legend>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {([false, true] as const).map((kit) => (
+                <label
+                  key={String(kit)}
+                  className={`flex min-h-11 cursor-pointer items-start gap-3 rounded-lg border p-3 ${
+                    isKit === kit ? 'border-brand-700 bg-brand-50' : 'border-line'
+                  }`}
+                >
+                  <input
+                    type="radio"
+                    name="productType"
+                    className="mt-0.5 size-5 accent-brand-700"
+                    checked={isKit === kit}
+                    onChange={() => setIsKit(kit)}
+                  />
+                  <span>
+                    <span className="font-medium">{t(kit ? 'kits.typeKit' : 'kits.typeNormal')}</span>
+                    <span className="block text-sm text-muted">{t(kit ? 'kits.typeKitHint' : 'kits.typeNormalHint')}</span>
+                  </span>
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        )}
+
         <fieldset disabled={!editable} className="grid gap-4 rounded-xl border border-line bg-white shadow-sm p-4 sm:grid-cols-2">
           <TextField
             name="name"
@@ -250,17 +378,13 @@ export function ProductFormPage() {
             onChange={set('sku')}
             error={errors.sku}
           />
-          <TextField
-            name="unit"
-            label={t('products.fields.unit')}
-            hint={t('products.fields.unitHint')}
-            maxLength={30}
-            value={form.unit}
-            onChange={set('unit')}
-          />
+          <div>
+            <UnitField value={form.unit} disabled={!editable} onChange={(unit) => setForm((f) => ({ ...f, unit }))} />
+            {errors.unit && <p className="text-sm font-medium text-danger">{errors.unit}</p>}
+          </div>
           <TextField name="cost" label={t('products.fields.cost')} inputMode="decimal" value={form.cost} onChange={set('cost')} error={errors.cost} />
           <TextField name="price" label={t('products.fields.price')} inputMode="decimal" value={form.price} onChange={set('price')} error={errors.price} />
-          {isNew ? (
+          {isNew && isKit ? null : isNew ? (
             <TextField
               name="stock"
               label={t('products.fields.initialStock')}
@@ -274,7 +398,9 @@ export function ProductFormPage() {
               <span className="font-medium">{t('products.fields.stock')}</span>
               <p className="flex min-h-11 flex-wrap items-center gap-x-3">
                 <span>
-                  {formatNumber(product?.stock ?? 0)} {product?.unit}
+                  {isKit
+                    ? t('kits.available', { count: product?.stock ?? 0 })
+                    : `${formatNumber(product?.stock ?? 0)} ${product?.unit}`}
                 </span>
                 {editable && (
                   <Link to={`/movimientos/nuevo?producto=${id}`} className="text-brand-700 underline">
@@ -282,6 +408,7 @@ export function ProductFormPage() {
                   </Link>
                 )}
               </p>
+              {breakdown && <p className="text-sm text-muted">{t('packages.breakdown', { parts: breakdown.join(', ') })}</p>}
             </div>
           )}
           <TextField
@@ -357,6 +484,25 @@ export function ProductFormPage() {
             )}
           </div>
         </fieldset>
+
+        {isKit ? (
+          <KitEditor
+            companyId={companyId}
+            kitId={id}
+            value={components}
+            onChange={setComponents}
+            errors={componentErrors}
+            disabled={!editable}
+          />
+        ) : (
+          <PackagesEditor
+            unit={form.unit.trim()}
+            value={packages}
+            onChange={setPackages}
+            errors={packageErrors}
+            disabled={!editable}
+          />
+        )}
 
         <div className="flex flex-col gap-2 sm:flex-row sm:flex-wrap">
           {editable && (
