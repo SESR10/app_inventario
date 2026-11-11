@@ -26,6 +26,7 @@ import {
   saveProduct,
   uploadImage,
 } from './api'
+import { AVANCE_1 } from '../avance'
 import { KitEditor, type ComponentDraft } from './KitEditor'
 import { PackagesEditor, type PackageDraft, type PackageErrors } from './PackagesEditor'
 import { UnitField } from './UnitField'
@@ -329,7 +330,7 @@ export function ProductFormPage() {
       </div>
 
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
-        {isNew && (
+        {isNew && !AVANCE_1 && (
           <fieldset className="flex flex-col gap-2 rounded-xl border border-line bg-surface p-4 shadow-sm">
             <legend className="float-left mb-1 font-semibold">{t('kits.typeLegend')}</legend>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -402,7 +403,7 @@ export function ProductFormPage() {
                     ? t('kits.available', { count: product?.stock ?? 0 })
                     : `${formatNumber(product?.stock ?? 0)} ${product?.unit}`}
                 </span>
-                {editable && (
+                {editable && !AVANCE_1 && (
                   <Link to={`/movimientos/nuevo?producto=${id}`} className="text-brand-700 underline">
                     {t('products.recordMovement')}
                   </Link>
@@ -494,7 +495,7 @@ export function ProductFormPage() {
             errors={componentErrors}
             disabled={!editable}
           />
-        ) : (
+        ) : AVANCE_1 ? null : (
           <PackagesEditor
             unit={form.unit.trim()}
             value={packages}
@@ -538,7 +539,7 @@ export function ProductFormPage() {
               {t('products.printLabel')}
             </LinkButton>
           )}
-          {!isNew && (
+          {!isNew && !AVANCE_1 && (
             <LinkButton to={`/movimientos?producto=${id}`} variant="secondary">
               {t('products.history')}
             </LinkButton>

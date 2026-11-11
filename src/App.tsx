@@ -6,6 +6,7 @@ import { AuthProvider } from './auth/AuthProvider'
 import { useAuth } from './auth/context'
 import { CompanyProvider } from './company/CompanyProvider'
 import { useCompany } from './company/context'
+import { AVANCE_1 } from './avance'
 import { Layout } from './components/Layout'
 import { Alert } from './components/ui/Alert'
 import { SupabaseContext } from './lib/client-context'
@@ -58,14 +59,18 @@ function CompanyGate() {
   return (
     <Routes>
       <Route element={<Layout />}>
-        <Route index element={<DashboardPage />} />
+        <Route index element={AVANCE_1 ? <ProductsPage /> : <DashboardPage />} />
         <Route path="productos" element={<ProductsPage />} />
         <Route path="productos/nuevo" element={<ProductFormPage />} />
         <Route path="productos/:id" element={<EditProductRoute />} />
         <Route path="etiquetas" element={<LabelsPage />} />
-        <Route path="movimientos" element={<MovementsPage />} />
-        <Route path="movimientos/nuevo" element={<MovementFormPage />} />
-        <Route path="equipo" element={<TeamPage />} />
+        {!AVANCE_1 && (
+          <>
+            <Route path="movimientos" element={<MovementsPage />} />
+            <Route path="movimientos/nuevo" element={<MovementFormPage />} />
+            <Route path="equipo" element={<TeamPage />} />
+          </>
+        )}
         <Route path="importar" element={<ImportExportPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
