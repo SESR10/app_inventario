@@ -8,14 +8,14 @@ interface Props extends InputHTMLAttributes<HTMLInputElement> {
 
 // Campo con etiqueta visible, ayuda y error asociados para lectores de pantalla.
 export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
-  { label, hint, error, id, className = '', ...rest },
+  { label, hint, error, id, className = '', 'aria-describedby': externalDescription, 'aria-invalid': externalInvalid, ...rest },
   ref,
 ) {
   const autoId = useId()
   const inputId = id ?? autoId
   const hintId = hint ? `${inputId}-ayuda` : undefined
   const errorId = error ? `${inputId}-error` : undefined
-  const describedBy = [hintId, errorId].filter(Boolean).join(' ') || undefined
+  const describedBy = [externalDescription, hintId, errorId].filter(Boolean).join(' ') || undefined
 
   return (
     <div className={`flex min-w-0 flex-col gap-1 ${className}`}>
@@ -31,7 +31,7 @@ export const TextField = forwardRef<HTMLInputElement, Props>(function TextField(
       <input
         ref={ref}
         id={inputId}
-        aria-invalid={error ? true : undefined}
+        aria-invalid={error ? true : externalInvalid}
         aria-describedby={describedBy}
         className={`min-h-11 w-full min-w-0 rounded-lg border bg-surface px-3 text-base transition-colors placeholder:text-muted/70 enabled:hover:border-brand-700 disabled:cursor-not-allowed disabled:opacity-60 ${error ? 'border-danger focus-visible:outline-danger' : 'border-slate-500'}`}
         {...rest}
