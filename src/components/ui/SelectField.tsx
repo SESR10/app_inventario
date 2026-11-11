@@ -21,6 +21,7 @@ export const SelectField = forwardRef<HTMLSelectElement, Props>(function SelectF
     <div className={`flex min-w-0 flex-col gap-1 ${className}`}>
       <label htmlFor={selectId} className="font-medium">
         {label}
+        {rest.required && <span aria-hidden="true"> *</span>}
       </label>
       {hint && (
         <p id={hintId} className="text-sm text-muted">
@@ -32,7 +33,7 @@ export const SelectField = forwardRef<HTMLSelectElement, Props>(function SelectF
         id={selectId}
         aria-invalid={error ? true : undefined}
         aria-describedby={describedBy}
-        className={`min-h-11 w-full min-w-0 rounded-lg border bg-surface transition-colors hover:border-brand-700 px-2 text-base ${error ? 'border-danger' : 'border-slate-500'}`}
+        className={`min-h-11 w-full min-w-0 rounded-lg border bg-surface px-3 text-base transition-colors enabled:hover:border-brand-700 disabled:cursor-not-allowed disabled:opacity-60 ${error ? 'border-danger focus-visible:outline-danger' : 'border-slate-500'}`}
         {...rest}
       >
         {children}
