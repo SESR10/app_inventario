@@ -39,7 +39,7 @@ export function PackagesEditor({ unit, value, onChange, errors, disabled }: Prop
   }
 
   return (
-    <section aria-labelledby={titleId} className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+    <section aria-labelledby={titleId} className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm">
       <h2 id={titleId} className="text-lg font-semibold">
         {t('packages.title')}
       </h2>

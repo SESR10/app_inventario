@@ -124,14 +124,14 @@ export function DashboardPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-br from-brand-700 via-brand-800 to-brand-950 px-5 py-6 text-white shadow-lg shadow-brand-900/20 sm:px-8 sm:py-8">
+      <div className="relative overflow-hidden rounded-2xl border border-line bg-gradient-to-br from-[#0e1a33] via-[#0b1224] to-[#120b2a] px-5 py-6 text-white shadow-[0_0_60px_-20px_rgb(139_92_246/0.6)] sm:px-8 sm:py-8">
         <HeroBoxes />
         <div className="relative flex max-w-xl flex-col gap-2">
           <p className="font-semibold text-accent-300">{t('dashboard.greeting')}</p>
           <PageHeading title={title} className="text-white">
             {t('dashboard.welcome', { company: current?.company.name })}
           </PageHeading>
-          <p className="text-brand-100">{t('dashboard.heroText')}</p>
+          <p className="text-brand-200">{t('dashboard.heroText')}</p>
           {canEdit(current?.role) && (
             <nav
               aria-label={t('dashboard.quickActions')}
@@ -142,7 +142,7 @@ export function DashboardPage() {
               </LinkButton>
               <LinkButton
                 to="/productos/nuevo"
-                className="border border-white/40 bg-white/10 text-white hover:bg-white/20"
+                variant="secondary"
               >
                 {t('products.new')}
               </LinkButton>
@@ -169,7 +169,7 @@ export function DashboardPage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="relative flex min-h-20 flex-col-reverse justify-center gap-0.5 rounded-xl border border-line bg-white py-4 pr-4 pl-20 shadow-sm"
+                className="relative flex min-h-20 flex-col-reverse justify-center gap-0.5 rounded-xl border border-line bg-surface py-4 pr-4 pl-20 shadow-sm"
               >
                 <dt className="text-sm font-medium text-muted">
                   {/* Ícono decorativo: dentro del término para que la lista siga siendo válida. */}
@@ -187,7 +187,7 @@ export function DashboardPage() {
                   )}
                 </dt>
                 <dd
-                  className={`truncate text-2xl font-extrabold tabular-nums ${stat.alert ? 'text-danger' : 'text-brand-950'}`}
+                  className={`truncate text-2xl font-extrabold tabular-nums ${stat.alert ? 'text-danger' : 'text-ink'}`}
                 >
                   {stat.value}
                 </dd>
@@ -213,7 +213,7 @@ export function DashboardPage() {
             {data.low.length === 0 ? (
               <p className="text-muted">{t('dashboard.lowStockNone')}</p>
             ) : (
-              <ul className="divide-y divide-line rounded-xl border border-line bg-white shadow-sm">
+              <ul className="divide-y divide-line rounded-xl border border-line bg-surface shadow-sm">
                 {data.low.map((p) => (
                   <li key={p.id} className="flex flex-wrap items-center justify-between gap-x-3 px-3 py-2">
                     <Link
@@ -262,16 +262,16 @@ export function DashboardPage() {
 function HeroBoxes() {
   const box = (x: number, y: number, s: number) => (
     <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path d="M20 4 35 12 20 20 5 12Z" fill="#fbbf24" />
-      <path d="M5 12 20 20v16L5 28Z" fill="#818cf8" />
-      <path d="M35 12 20 20v16l15-8Z" fill="#6366f1" />
+      <path d="M20 4 35 12 20 20 5 12Z" fill="#22e3ff" />
+      <path d="M5 12 20 20v16L5 28Z" fill="#a78bfa" />
+      <path d="M35 12 20 20v16l15-8Z" fill="#4f46e5" />
     </g>
   )
   return (
     <svg
       viewBox="0 0 200 160"
       aria-hidden="true"
-      className="pointer-events-none absolute -right-6 -bottom-6 hidden w-72 opacity-90 xl:block"
+      className="pointer-events-none absolute -right-6 -bottom-6 hidden w-72 opacity-90 drop-shadow-[0_0_24px_rgb(34_227_255/0.45)] xl:block"
     >
       {box(40, 70, 2)}
       {box(100, 70, 2)}

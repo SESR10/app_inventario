@@ -220,7 +220,7 @@ export function MovementFormPage() {
         {result?.low && <Alert>{result.low}</Alert>}
       </div>
 
-      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5 rounded-xl border border-line bg-white shadow-sm p-4">
+      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5 rounded-xl border border-line bg-surface shadow-sm p-4">
         <ProductPicker
           ref={searchRef}
           companyId={companyId}

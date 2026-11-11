@@ -4,11 +4,15 @@ import { Link, type LinkProps } from 'react-router-dom'
 type Variant = 'primary' | 'accent' | 'secondary' | 'ghost' | 'danger'
 
 const variants: Record<Variant, string> = {
-  primary: 'bg-brand-700 text-white shadow-sm shadow-brand-700/30 hover:bg-brand-800 disabled:bg-slate-400 disabled:shadow-none',
-  accent: 'bg-accent-400 text-brand-950 shadow-sm hover:bg-accent-300 disabled:bg-slate-300',
-  secondary: 'border border-slate-300 bg-white text-ink hover:border-brand-200 hover:bg-brand-50 disabled:text-muted',
+  primary:
+    'btn-neon hover:-translate-y-px hover:brightness-110 hover:shadow-[0_8px_30px_-6px_rgb(34_227_255/0.8)] disabled:translate-y-0 disabled:bg-none disabled:bg-slate-400 disabled:text-muted disabled:shadow-none',
+  accent:
+    'btn-neon hover:-translate-y-px hover:brightness-110 hover:shadow-[0_8px_30px_-6px_rgb(34_227_255/0.8)] disabled:translate-y-0 disabled:bg-none disabled:bg-slate-300 disabled:text-muted disabled:shadow-none',
+  secondary:
+    'btn-glass hover:-translate-y-px hover:border-accent-400 hover:shadow-[0_0_18px_-4px_rgb(34_227_255/0.6)] disabled:translate-y-0 disabled:text-muted disabled:shadow-none',
   ghost: 'text-brand-700 underline-offset-4 hover:underline disabled:text-muted',
-  danger: 'bg-danger text-white hover:bg-red-800 disabled:bg-slate-400',
+  danger:
+    'border border-danger/60 bg-danger/10 text-danger hover:-translate-y-px hover:bg-danger hover:text-[#14030a] hover:shadow-[0_0_20px_-4px_rgb(255_107_129/0.7)] disabled:translate-y-0 disabled:bg-slate-400',
 }
 
 interface Props extends ComponentPropsWithRef<'button'> {
@@ -23,7 +27,7 @@ export function Button({ variant = 'primary', busy = false, className = '', disa
       {...rest}
       disabled={disabled || busy}
       aria-busy={busy || undefined}
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-base font-semibold transition-colors disabled:cursor-not-allowed ${variants[variant]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-base font-semibold transition-all duration-200 disabled:cursor-not-allowed ${variants[variant]} ${className}`}
     >
       {children}
     </button>
@@ -35,7 +39,7 @@ export function LinkButton({ variant = 'primary', className = '', ...rest }: Lin
   return (
     <Link
       {...rest}
-      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-lg px-4 text-base font-semibold transition-colors ${variants[variant]} ${className}`}
+      className={`inline-flex min-h-11 items-center justify-center gap-2 rounded-xl px-4 text-base font-semibold transition-all duration-200 ${variants[variant]} ${className}`}
     />
   )
 }

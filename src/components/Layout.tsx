@@ -26,13 +26,13 @@ export function Layout() {
     <div className="min-h-dvh md:flex">
       <a
         href="#contenido"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-white focus:px-4 focus:py-2 focus:shadow"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-50 focus:rounded-md focus:bg-surface focus:px-4 focus:py-2 focus:shadow"
       >
         {t('app.skipToContent')}
       </a>
 
-      <header className="sticky top-0 z-30 flex md:self-start items-center gap-3 border-b border-line bg-white px-4 py-2 print:hidden md:h-dvh md:w-64 md:shrink-0 md:flex-col md:items-stretch md:gap-6 md:border-0 md:bg-brand-950 md:px-4 md:py-6 md:[&_*:focus-visible]:outline-accent-300">
-        <Logo className="shrink-0 md:px-2" wordClassName="text-brand-950 md:text-white" />
+      <header className="sticky top-0 z-30 flex md:self-start items-center gap-3 border-b border-line bg-surface px-4 py-2 print:hidden md:h-dvh md:w-64 md:shrink-0 md:flex-col md:items-stretch md:gap-6 md:border-0 md:border-r md:border-line md:bg-brand-950/80 md:px-4 md:py-6 md:[&_*:focus-visible]:outline-accent-300">
+        <Logo className="shrink-0 md:px-2" wordClassName="text-ink md:text-white" />
 
         {current && (
           <div className="flex min-w-0 flex-col gap-1 md:rounded-xl md:bg-white/5 md:p-3">
@@ -48,7 +48,7 @@ export function Layout() {
                   id={companySelectId}
                   value={current.company.id}
                   onChange={(e) => select(e.target.value)}
-                  className="min-h-11 w-full min-w-0 truncate rounded-lg border border-slate-500 bg-white px-2 font-medium md:border-white/40 md:bg-brand-900 md:text-white"
+                  className="min-h-11 w-full min-w-0 truncate rounded-lg border border-slate-500 bg-surface px-2 font-medium md:border-white/40 md:bg-brand-900 md:text-white"
                 >
                   {memberships.map((m) => (
                     <option key={m.company.id} value={m.company.id}>
@@ -65,7 +65,7 @@ export function Layout() {
 
         <nav
           aria-label={t('nav.label')}
-          className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-white pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(30_27_75/0.08)] md:static md:flex-1 md:border-0 md:bg-transparent md:pb-0 md:shadow-none"
+          className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(30_27_75/0.08)] md:static md:flex-1 md:border-0 md:bg-transparent md:pb-0 md:shadow-none"
         >
           <ul className="grid grid-cols-5 gap-1 px-1 py-1.5 md:flex md:flex-col md:p-0">
             {links.map(({ to, key, icon: Icon, ...rest }) => (
@@ -76,8 +76,8 @@ export function Layout() {
                   className={({ isActive }) =>
                     `flex min-h-14 flex-col items-center justify-center gap-0.5 rounded-xl px-1 text-xs font-semibold md:min-h-11 md:flex-row md:justify-start md:gap-3 md:px-3 md:text-base ${
                       isActive
-                        ? 'bg-brand-50 text-brand-700 md:bg-accent-400 md:text-brand-950 md:shadow-sm'
-                        : 'text-muted hover:bg-slate-100 md:text-brand-100 md:hover:bg-white/10'
+                        ? 'bg-brand-50 text-brand-700 md:btn-neon md:text-brand-950'
+                        : 'text-muted hover:bg-slate-100 md:text-brand-200 md:hover:bg-white/10'
                     }`
                   }
                 >
@@ -93,7 +93,7 @@ export function Layout() {
         <button
           type="button"
           onClick={() => void signOut()}
-          className="ml-auto inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-3 rounded-xl px-2 font-medium text-muted hover:bg-slate-100 md:ml-0 md:justify-start md:px-3 md:text-brand-100 md:hover:bg-white/10"
+          className="ml-auto inline-flex min-h-11 min-w-11 shrink-0 items-center justify-center gap-3 rounded-xl px-2 font-medium text-muted hover:bg-slate-100 md:ml-0 md:justify-start md:px-3 md:text-brand-200 md:hover:bg-white/10"
         >
           <LogOut aria-hidden="true" className="size-5" />
           <span className="sr-only md:not-sr-only">{t('nav.signOut')}</span>

@@ -46,7 +46,7 @@ export function CreateCompanyPage() {
 
       {formError && <Alert tone="error">{formError}</Alert>}
 
-      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4 rounded-xl border border-line bg-white shadow-sm p-5">
+      <form noValidate onSubmit={onSubmit} className="flex flex-col gap-4 rounded-xl border border-line bg-surface shadow-sm p-5">
         <TextField
           label={t('company.name')}
           required

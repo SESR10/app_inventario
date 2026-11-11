@@ -140,7 +140,7 @@ export function ProductsPage() {
       {deleteResult && <Alert tone={deleteResult.tone}>{deleteResult.text}</Alert>}
       {error && <Alert tone="error">{t('products.loadError')}</Alert>}
 
-      <search className="flex flex-col gap-3 rounded-xl border border-line bg-white shadow-sm p-4">
+      <search className="flex flex-col gap-3 rounded-xl border border-line bg-surface shadow-sm p-4">
         <TextField
           label={t('products.search')}
           type="search"
