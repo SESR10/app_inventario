@@ -110,7 +110,7 @@ export const ProductPicker = forwardRef<HTMLInputElement, Props>(function Produc
       </p>
       {shown && shown.length === 0 && <p className="text-muted">{t('movements.noResults')}</p>}
       {shown && shown.length > 0 && (
-        <ul aria-label={t('movements.resultsLabel')} className="divide-y divide-line rounded-md border border-line bg-white">
+        <ul aria-label={t('movements.resultsLabel')} className="divide-y divide-line rounded-md border border-line bg-surface">
           {shown.map((row) => (
             <li key={row.id}>
               <button

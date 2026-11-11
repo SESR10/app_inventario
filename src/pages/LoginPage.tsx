@@ -84,7 +84,7 @@ export function LoginPage() {
         <form
           noValidate
           onSubmit={onSubmit}
-          className="flex flex-col gap-4 rounded-2xl border border-line bg-white p-5 shadow-sm sm:p-6"
+          className="flex flex-col gap-4 rounded-2xl border border-line bg-surface p-5 shadow-sm sm:p-6"
         >
           <TextField
             label={t('auth.email')}
@@ -127,13 +127,13 @@ function BrandPanel() {
     { icon: BellRing, text: t('auth.features.alerts') },
   ]
   return (
-    <aside className="relative hidden overflow-hidden bg-gradient-to-br from-brand-700 via-brand-900 to-brand-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+    <aside className="relative hidden overflow-hidden border-r border-line bg-gradient-to-br from-[#0e1a33] via-[#0b1224] to-[#160d33] p-12 text-white shadow-[inset_0_0_120px_-40px_rgb(34_227_255/0.35)] lg:flex lg:flex-col lg:justify-between">
       <Logo wordClassName="text-white" />
       <div className="relative flex max-w-md flex-col gap-6">
         <p className="text-4xl leading-tight font-extrabold tracking-tight">{t('auth.tagline')}</p>
         <ul className="flex flex-col gap-3">
           {features.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-3 text-lg text-brand-100">
+            <li key={text} className="flex items-center gap-3 text-lg text-brand-200">
               <span className="grid size-10 place-items-center rounded-xl bg-white/10 text-accent-300">
                 <Icon aria-hidden="true" className="size-5" />
               </span>

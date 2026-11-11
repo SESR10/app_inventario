@@ -101,3 +101,7 @@ grandes, facilidad de uso y apariencia profesional.
   (`products.import_id`) o por los filtros de la lista, en lotes de 1000 y sin borrar piezas de un kit. En Productos:
   "Eliminar N productos" (selección) y, para administradores, "Eliminar todos"/"los de esta lista" con la palabra
   ELIMINAR; al terminar una importación, "Deshacer esta importación" borra los productos nuevos que creó.
+- Tema oscuro "neón" (2026-11-11, pedido de santiago: menos blanco, futurista): tokens en `src/index.css` (fondo azul
+  noche con brillos y cuadrícula, escalas slate/red/green/... llevadas a oscuro), `bg-surface` para paneles (sin
+  `backdrop-filter`), botones `btn-neon` (degradado cian→violeta con brillo) y `btn-glass`; títulos en Space Grotesk
+  (@fontsource). Las etiquetas impresas siguen en blanco y negro.

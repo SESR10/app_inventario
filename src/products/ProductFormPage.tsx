@@ -330,7 +330,7 @@ export function ProductFormPage() {
 
       <form noValidate onSubmit={onSubmit} className="flex flex-col gap-5">
         {isNew && (
-          <fieldset className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4 shadow-sm">
+          <fieldset className="flex flex-col gap-2 rounded-xl border border-line bg-surface p-4 shadow-sm">
             <legend className="float-left mb-1 font-semibold">{t('kits.typeLegend')}</legend>
             <div className="grid gap-2 sm:grid-cols-2">
               {([false, true] as const).map((kit) => (
@@ -357,7 +357,7 @@ export function ProductFormPage() {
           </fieldset>
         )}
 
-        <fieldset disabled={!editable} className="grid gap-4 rounded-xl border border-line bg-white shadow-sm p-4 sm:grid-cols-2">
+        <fieldset disabled={!editable} className="grid gap-4 rounded-xl border border-line bg-surface shadow-sm p-4 sm:grid-cols-2">
           <TextField
             name="name"
             label={t('products.fields.name')}
@@ -507,7 +507,7 @@ export function ProductFormPage() {
         {product?.extra && Object.keys(product.extra).length > 0 && (
           <section
             aria-labelledby="otros-datos"
-            className="flex flex-col gap-2 rounded-xl border border-line bg-white p-4 shadow-sm sm:p-6"
+            className="flex flex-col gap-2 rounded-xl border border-line bg-surface p-4 shadow-sm sm:p-6"
           >
             <h2 id="otros-datos" className="text-lg font-semibold">
               {t('products.extraTitle')}

@@ -37,7 +37,7 @@ export function KitEditor({ companyId, kitId, value, onChange, errors, disabled 
     onChange(value.map((c) => (c.component_id === id ? { ...c, quantity } : c)))
 
   return (
-    <section aria-labelledby={titleId} className="flex flex-col gap-3 rounded-xl border border-line bg-white p-4 shadow-sm">
+    <section aria-labelledby={titleId} className="flex flex-col gap-3 rounded-xl border border-line bg-surface p-4 shadow-sm">
       <h2 id={titleId} className="text-lg font-semibold">
         {t('kits.title')}
       </h2>

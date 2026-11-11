@@ -1,40 +1,95 @@
 @import 'tailwindcss';
 
-/* Paleta "bodega": índigo profundo con acento ámbar (cajas, etiquetas).
-   Textos con contraste mínimo 4.5:1 sobre blanco y sobre el fondo (WCAG 2.2 AA). */
+/* Tema oscuro "neón": fondo azul noche, paneles de vidrio oscuro, acentos cian y violeta con brillo.
+   Textos con contraste mínimo 4.5:1 sobre el fondo y sobre los paneles (WCAG 2.2 AA). */
 @theme {
-  --color-brand-50: #eef2ff;
-  --color-brand-100: #e0e7ff;
-  --color-brand-200: #c7d2fe;
-  --color-brand-600: #4f46e5;
-  --color-brand-700: #4338ca;
-  --color-brand-800: #3730a3;
-  --color-brand-900: #312e81;
-  --color-brand-950: #1e1b4b;
-  --color-accent-200: #fde68a;
-  --color-accent-300: #fcd34d;
-  --color-accent-400: #fbbf24;
-  --color-canvas: #f4f5fb;
-  --color-ink: #111827;
-  --color-muted: #4b5563;
-  --color-line: #dfe2ee;
-  --color-danger: #b91c1c;
-  --color-success: #15803d;
+  --color-brand-50: #0f1d36;
+  --color-brand-100: #142a4d;
+  --color-brand-200: #9cc3ff;
+  --color-brand-600: #38bdf8;
+  --color-brand-700: #5cc8ff;
+  --color-brand-800: #8fd9ff;
+  --color-brand-900: #0a1428;
+  --color-brand-950: #04070f;
+  --color-accent-200: #3a2f0e;
+  --color-accent-300: #7df0ff;
+  --color-accent-400: #22e3ff;
+  --color-canvas: #060912;
+  --color-ink: #e8eefb;
+  --color-muted: #9eabc4;
+  --color-line: #1f2b45;
+  --color-danger: #ff6b81;
+  --color-success: #3ee6a4;
+
+  /* Escalas de Tailwind usadas en la app, llevadas al tema oscuro. */
+  --color-slate-50: #0a1020;
+  --color-slate-100: #131c30;
+  --color-slate-300: #2a3756;
+  --color-slate-400: #34425f;
+  --color-slate-500: #3d4f74;
+  --color-red-50: #2a0d17;
+  --color-red-100: #3a1221;
+  --color-red-800: #e0435f;
+  --color-green-50: #0a2a20;
+  --color-emerald-100: #0b2e24;
+  --color-emerald-700: #3ee6a4;
+  --color-sky-100: #0b2638;
+  --color-sky-700: #5cc8ff;
+  --color-violet-100: #1e1440;
+  --color-violet-700: #b69cff;
+  --color-amber-800: #ffd166;
+
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-display: 'Space Grotesk Variable', 'Plus Jakarta Sans Variable', system-ui, sans-serif;
 }
 
 @layer base {
   html {
+    color-scheme: dark;
     color: var(--color-ink);
-    background: var(--color-canvas);
+    background-color: var(--color-canvas);
+    /* Brillos suaves y cuadrícula tenue, fijos detrás del contenido. */
+    background-image:
+      radial-gradient(60rem 30rem at 85% -10%, rgb(139 92 246 / 0.18), transparent 60%),
+      radial-gradient(50rem 28rem at -10% 110%, rgb(34 227 255 / 0.12), transparent 60%),
+      linear-gradient(rgb(255 255 255 / 0.025) 1px, transparent 1px),
+      linear-gradient(90deg, rgb(255 255 255 / 0.025) 1px, transparent 1px);
+    background-size: auto, auto, 40px 40px, 40px 40px;
+    background-attachment: fixed;
     -webkit-text-size-adjust: 100%;
+  }
+
+  h1, h2, h3 {
+    font-family: var(--font-display);
+    letter-spacing: -0.01em;
+  }
+
+  /* Botón de los campos de archivo, con el mismo estilo de la app. */
+  input[type='file']::file-selector-button {
+    margin-right: 0.75rem;
+    border: 1px solid rgb(34 227 255 / 0.4);
+    border-radius: 0.5rem;
+    background: rgb(34 227 255 / 0.08);
+    color: var(--color-ink);
+    font: inherit;
+    font-weight: 600;
+    padding: 0.4rem 0.9rem;
+    cursor: pointer;
   }
 
   /* Foco siempre visible al navegar con teclado. */
   :focus-visible {
-    outline: 3px solid var(--color-brand-700);
+    outline: 3px solid var(--color-accent-400);
     outline-offset: 2px;
     border-radius: 4px;
+  }
+
+  @media print {
+    html {
+      color-scheme: light;
+      color: #000;
+      background: #fff;
+    }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -46,4 +101,22 @@
       scroll-behavior: auto !important;
     }
   }
+}
+
+/* Paneles: vidrio oscuro con borde que brilla apenas. */
+@utility bg-surface {
+  /* Sin backdrop-filter: rompe el menú fijo de abajo en el celular. */
+  background-color: rgb(12 19 34 / 0.9);
+}
+
+/* Botones con brillo de neón. */
+@utility btn-neon {
+  background-image: linear-gradient(110deg, #22e3ff, #a78bfa);
+  color: #050814;
+  box-shadow: 0 0 0 1px rgb(255 255 255 / 0.15) inset, 0 6px 24px -6px rgb(34 227 255 / 0.6);
+}
+@utility btn-glass {
+  background-color: rgb(255 255 255 / 0.04);
+  border: 1px solid rgb(34 227 255 / 0.35);
+  color: var(--color-ink);
 }

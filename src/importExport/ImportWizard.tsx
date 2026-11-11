@@ -583,7 +583,7 @@ export function ImportWizard() {
                         {issue.column !== null && (
                           <input
                             aria-label={t('importExport.fixLabel', { row: issue.row, column: columns(issue.field) })}
-                            className="min-h-11 w-full min-w-32 rounded-lg border border-slate-500 bg-white px-2 text-base hover:border-brand-700"
+                            className="min-h-11 w-full min-w-32 rounded-lg border border-slate-500 bg-surface px-2 text-base hover:border-brand-700"
                             value={fixes[`${issue.index}:${issue.column}`] ?? cellValue(issue)}
                             onChange={(e) =>
                               setFixes((f) => ({ ...f, [`${issue.index}:${issue.column}`]: e.target.value }))
