@@ -4,15 +4,18 @@ import { useTranslation } from 'react-i18next'
 import { NavLink, Outlet } from 'react-router-dom'
 import { useAuth } from '../auth/context'
 import { useCompany } from '../company/context'
+import { AVANCE_1 } from '../avance'
 import { Logo } from './Logo'
 
-const links = [
+const allLinks = [
   { to: '/', key: 'dashboard', icon: LayoutDashboard, end: true },
   { to: '/productos', key: 'products', icon: Package },
   { to: '/movimientos', key: 'movements', icon: ArrowLeftRight },
   { to: '/importar', key: 'import', icon: FileSpreadsheet },
   { to: '/equipo', key: 'team', icon: Users },
 ] as const
+
+const links = AVANCE_1 ? allLinks.filter((l) => l.key === 'products' || l.key === 'import') : allLinks
 
 // Celular: barra superior y menú fijo abajo, al alcance del pulgar.
 // Escritorio: barra lateral oscura con el menú completo.
@@ -67,7 +70,7 @@ export function Layout() {
           aria-label={t('nav.label')}
           className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-4px_16px_rgb(30_27_75/0.08)] md:static md:flex-1 md:border-0 md:bg-transparent md:pb-0 md:shadow-none"
         >
-          <ul className="grid grid-cols-5 gap-1 px-1 py-1.5 md:flex md:flex-col md:p-0">
+          <ul className={`grid ${AVANCE_1 ? 'grid-cols-2' : 'grid-cols-5'} gap-1 px-1 py-1.5 md:flex md:flex-col md:p-0`}>
             {links.map(({ to, key, icon: Icon, ...rest }) => (
               <li key={to}>
                 <NavLink
