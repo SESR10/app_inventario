@@ -53,7 +53,7 @@ export function ConfirmDialog({
       aria-describedby={bodyId}
       onCancel={(e) => {
         e.preventDefault()
-        onCancel()
+        if (!busy) onCancel()
       }}
       className="m-auto w-[min(28rem,calc(100%-2rem))] rounded-lg p-0 backdrop:bg-slate-900/50"
     >
@@ -73,7 +73,7 @@ export function ConfirmDialog({
           />
         )}
         <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
-          <Button ref={cancelRef} variant="secondary" onClick={onCancel}>
+          <Button ref={cancelRef} variant="secondary" onClick={onCancel} disabled={busy}>
             {cancelLabel}
           </Button>
           <Button variant="danger" onClick={onConfirm} busy={busy} disabled={!confirmed}>

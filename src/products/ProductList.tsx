@@ -65,7 +65,7 @@ export function ProductList({ rows, total, hasMore, loading, selected, onToggle,
                 ref={virtualizer.measureElement}
                 aria-setsize={total ?? -1}
                 aria-posinset={item.index + 1}
-                className="absolute top-0 left-0 w-full border-b border-line"
+                className={`absolute top-0 left-0 w-full border-b border-line transition-colors hover:bg-brand-50 focus-within:bg-brand-50 ${selected.has(row.id) ? 'bg-brand-100 shadow-[inset_3px_0_0_var(--color-brand-700)]' : ''}`}
                 style={{ transform: `translateY(${item.start}px)` }}
               >
                 <div className="flex items-center gap-3 px-3 py-2">
@@ -93,7 +93,7 @@ export function ProductList({ rows, total, hasMore, loading, selected, onToggle,
                     </div>
                     <p className="text-sm sm:w-60 sm:text-right">
                       <span className="text-muted">{t('products.stockLabel')}: </span>
-                      <span className="font-medium">
+                      <span className="font-medium tabular-nums">
                         {row.is_kit ? t('kits.availableShort', { count: Number(row.stock) }) : `${formatNumber(row.stock)} ${row.unit}`}
                       </span>
                       {low && (
@@ -102,7 +102,7 @@ export function ProductList({ rows, total, hasMore, loading, selected, onToggle,
                         </span>
                       )}
                     </p>
-                    <p className="text-sm sm:w-28 sm:text-right">
+                    <p className="text-sm tabular-nums sm:w-28 sm:text-right">
                       <span className="text-muted sm:sr-only">{t('products.priceLabel')}: </span>
                       {formatMoney(row.price)}
                     </p>
