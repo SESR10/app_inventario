@@ -42,6 +42,10 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
+- Correcciones de accesibilidad: los campos conservan descripciones externas junto con
+  ayuda y errores propios; un error interno siempre marca el campo como invalido.
+- Dialogos de confirmacion: cancelar y Escape quedan bloqueados durante una operacion
+  en curso. Pruebas de regresion para ambos cambios.
 - Mejoras visuales: campos con estados deshabilitados y de error consistentes, selectores
   obligatorios identificados, avisos con iconos y filas de productos con resaltado de
   seleccion y foco. Cambios de presentacion sin modificar operaciones de inventario.
