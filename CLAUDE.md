@@ -42,6 +42,9 @@ grandes, facilidad de uso y apariencia profesional.
 - Al final de cada fase, actualiza la sección "Estado" de este archivo.
 
 ## Estado
+- Mejoras visuales: campos con estados deshabilitados y de error consistentes, selectores
+  obligatorios identificados, avisos con iconos y filas de productos con resaltado de
+  seleccion y foco. Cambios de presentacion sin modificar operaciones de inventario.
 - Fase actual: 8 terminada (importar el Excel de cada empresa). Propuestas sin pedir aún: 9 atajos,
   10 seguridad (papelera, auditoría, respaldo).
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
