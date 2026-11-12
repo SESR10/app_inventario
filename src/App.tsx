@@ -2,6 +2,7 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 import { lazy } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
+import { AssistantPage } from './assistant/AssistantPage'
 import { AuthProvider } from './auth/AuthProvider'
 import { useAuth } from './auth/context'
 import { CompanyProvider } from './company/CompanyProvider'
@@ -67,6 +68,7 @@ function CompanyGate() {
         <Route path="movimientos/nuevo" element={<MovementFormPage />} />
         <Route path="equipo" element={<TeamPage />} />
         <Route path="importar" element={<ImportExportPage />} />
+        <Route path="asistente" element={<AssistantPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Route>
     </Routes>

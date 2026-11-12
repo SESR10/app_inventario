@@ -49,8 +49,8 @@ grandes, facilidad de uso y apariencia profesional.
 - Mejoras visuales: campos con estados deshabilitados y de error consistentes, selectores
   obligatorios identificados, avisos con iconos y filas de productos con resaltado de
   seleccion y foco. Cambios de presentacion sin modificar operaciones de inventario.
-- Fase actual: 8 terminada (importar el Excel de cada empresa). Propuestas sin pedir aún: 9 atajos,
-  10 seguridad (papelera, auditoría, respaldo).
+- Fase actual: 9 terminada (asistente con IA, recomendación del profesor). Pendientes del profesor sin pedir aún:
+  WhatsApp para el asistente, pagos en línea, facturación electrónica, cartera a 30 días.
 - Fase 1: Vite + React + TS + Tailwind; esquema Supabase (empresas, miembros con rol,
   categorías, ubicaciones, proveedores, productos, movimientos) con RLS por company_id,
   claves compuestas entre empresas e índices (trigram para búsqueda, stock bajo);
@@ -117,4 +117,11 @@ grandes, facilidad de uso y apariencia profesional.
   ámbar); en celular sigue el menú fijo abajo con las fotos. Fotos reales en vez de íconos de línea (`src/assets/secciones`,
   webp generadas en Figma). Tema grafito cálido con acento ámbar sólido (`btn-solid`, `btn-soft`), sin degradados neón,
   brillos ni cuadrícula; títulos sin Space Grotesk. Bienvenida del panel e ingreso con foto de bodega.
-
+- Fase 9 (2026-11-12, recomendaciones del profesor): migración `20261112000000_asistente_pedidos.sql` con `customer_orders` y
+  `customer_order_items` (solo lectura por RLS), `create_customer_order`, `list_customer_orders` y
+  `set_customer_order_status` (al entregar registra la salida de cada producto con `record_movement`, todo o nada).
+  Función Edge `supabase/functions/asistente` (Deno): API de Claude (modelo en `agent.ts`), esfuerzo bajo, `fallbacks: "default"`,
+  herramientas `buscar_productos` y `crear_pedido` con la sesión del usuario; lógica en `agent.ts` probada con Vitest
+  (`tsconfig.functions.json`). Pantalla `/asistente`: chat (región `log`) y pedidos para recoger con filtros y acciones.
+  Secreto `ANTHROPIC_API_KEY` en Supabase. Menú con 6 secciones (foto `asistente.webp` de Figma; en celular
+  "Movimientos" se muestra como "Historial").

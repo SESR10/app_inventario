@@ -11,10 +11,12 @@ interface Options {
   tables?: Record<string, Row[]>
   // Respuesta de cada función RPC según sus argumentos.
   rpc?: Record<string, (args: Record<string, unknown>) => unknown>
+  // Respuesta de cada función Edge según su cuerpo; lanzar un objeto simula un error ({ context: Response }).
+  functions?: Record<string, (body: unknown) => unknown>
 }
 
 // Cliente mínimo de Supabase para pruebas de interfaz, sin red.
-export function fakeClient({ signedIn = false, memberships = [], tables = {}, rpc = {} }: Options = {}) {
+export function fakeClient({ signedIn = false, memberships = [], tables = {}, rpc = {}, functions = {} }: Options = {}) {
   const session = signedIn ? { user: { id: 'u1', email: 'ana@empresa.com' } } : null
   const writes: { table: string; op: string; payload?: unknown; filters: [string, unknown][] }[] = []
 
@@ -80,6 +82,15 @@ export function fakeClient({ signedIn = false, memberships = [], tables = {}, rp
       }
     }),
     storage: { from: vi.fn(() => storageBucket) },
+    functions: {
+      invoke: vi.fn(async (name: string, options: { body?: unknown } = {}) => {
+        try {
+          return { data: await (functions[name] ?? (() => null))(options.body), error: null }
+        } catch (error) {
+          return { data: null, error }
+        }
+      }),
+    },
     writes,
     storageBucket,
   }
