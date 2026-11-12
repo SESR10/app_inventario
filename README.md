@@ -33,6 +33,21 @@ App web de inventario multiempresa. La especificación completa está en [CLAUDE
 2. En Supabase, Authentication > URL Configuration: Site URL = la dirección de Vercel; agrega
    `http://localhost:5173` en Redirect URLs para seguir probando en local.
 
+## Asistente con IA
+
+El asistente (pantalla "Asistente y pedidos") responde con el inventario real y aparta pedidos para recoger.
+Corre en la función Edge `supabase/functions/asistente`, que llama a la API de Claude con la sesión de quien
+escribe (las reglas por empresa siguen aplicando).
+
+1. Corre la migración `20261112000000_asistente_pedidos.sql` en el SQL Editor de Supabase.
+2. Crea una clave en https://console.anthropic.com (API Keys). Cada mensaje tiene un costo pequeño.
+3. Publica la función y guarda la clave como secreto:
+   ```
+   npx supabase login
+   npx supabase functions deploy asistente --project-ref <id-del-proyecto>
+   npx supabase secrets set ANTHROPIC_API_KEY=<clave> --project-ref <id-del-proyecto>
+   ```
+
 ## Estructura
 
 - `src/auth`, `src/company`: sesión y empresa activa
@@ -40,4 +55,6 @@ App web de inventario multiempresa. La especificación completa está en [CLAUDE
 - `src/pages`: pantallas
 - `src/i18n`: textos de la interfaz (español por defecto)
 - `src/products`: lista, formulario y etiquetas de productos
+- `src/assistant`: chat con el asistente y pedidos para recoger
+- `supabase/functions/asistente`: función Edge del asistente (Claude)
 - `supabase/migrations`: esquema, índices y reglas de acceso (RLS)

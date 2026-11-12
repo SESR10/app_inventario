@@ -11,6 +11,7 @@ const links = [
   { to: '/', key: 'dashboard', image: sectionImages.panel, end: true },
   { to: '/productos', key: 'products', image: sectionImages.caja },
   { to: '/movimientos', key: 'movements', image: sectionImages.movimientos },
+  { to: '/asistente', key: 'assistant', image: sectionImages.asistente },
   { to: '/importar', key: 'import', image: sectionImages.importar },
   { to: '/equipo', key: 'team', image: sectionImages.equipo },
 ] as const
@@ -67,7 +68,7 @@ export function Layout() {
           aria-label={t('nav.label')}
           className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_20px_rgb(0_0_0/0.35)] md:static md:mx-auto md:rounded-2xl md:border md:bg-slate-50 md:p-1.5 md:pb-1.5 md:shadow-none"
         >
-          <ul className="grid grid-cols-5 gap-1 px-1 py-1.5 md:flex md:gap-1 md:p-0">
+          <ul className="grid grid-cols-6 gap-0.5 px-1 py-1.5 md:flex md:gap-1 md:p-0">
             {links.map(({ to, key, image, ...rest }) => (
               <li key={to}>
                 <NavLink
@@ -88,7 +89,7 @@ export function Layout() {
                     height={36}
                     className="size-7 shrink-0 rounded-lg object-cover ring-1 ring-black/30 transition-transform duration-200 ease-out group-hover:scale-110 group-aria-[current=page]:ring-2 group-aria-[current=page]:ring-white/70 md:size-8 xl:size-9"
                   />
-                  <span className="xl:hidden">{t(`navShort.${key}`)}</span>
+                  <span className="max-w-full truncate text-[11px] tracking-tight md:text-sm md:tracking-normal xl:hidden">{t(`navShort.${key}`)}</span>
                   <span className="hidden xl:inline">{t(`nav.${key}`)}</span>
                 </NavLink>
               </li>
