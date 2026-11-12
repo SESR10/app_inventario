@@ -112,3 +112,9 @@ grandes, facilidad de uso y apariencia profesional.
   noche con brillos y cuadrícula, escalas slate/red/green/... llevadas a oscuro), `bg-surface` para paneles (sin
   `backdrop-filter`), botones `btn-neon` (degradado cian→violeta con brillo) y `btn-glass`; títulos en Space Grotesk
   (@fontsource). Las etiquetas impresas siguen en blanco y negro.
+- Rediseño con Figma (2026-11-12, el profesor dijo que se veía "muy IA"): diseño en Figma (archivo "App Inventario - Rediseño")
+  aprobado por santiago. Menú arriba en una sola barra con pestañas con foto (se levantan al pasar el mouse; la activa en
+  ámbar); en celular sigue el menú fijo abajo con las fotos. Fotos reales en vez de íconos de línea (`src/assets/secciones`,
+  webp generadas en Figma). Tema grafito cálido con acento ámbar sólido (`btn-solid`, `btn-soft`), sin degradados neón,
+  brillos ni cuadrícula; títulos sin Space Grotesk. Bienvenida del panel e ingreso con foto de bodega.
+
