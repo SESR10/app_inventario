@@ -13,7 +13,7 @@ export function PageHeading({ children, title, className = '' }: { children: Rea
   }, [title, t])
 
   return (
-    <h1 ref={ref} tabIndex={-1} className={`text-2xl font-extrabold tracking-tight text-ink font-display focus:outline-none sm:text-3xl ${className}`}>
+    <h1 ref={ref} tabIndex={-1} className={`text-2xl font-extrabold tracking-tight text-ink focus:outline-none sm:text-3xl ${className}`}>
       {children}
     </h1>
   )

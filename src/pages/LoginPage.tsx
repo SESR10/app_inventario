@@ -1,4 +1,4 @@
-import { Barcode, BellRing, FileSpreadsheet } from 'lucide-react'
+import { sectionImages } from '../assets/secciones'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Logo } from '../components/Logo'
@@ -122,27 +122,27 @@ export function LoginPage() {
 function BrandPanel() {
   const { t } = useTranslation()
   const features = [
-    { icon: Barcode, text: t('auth.features.labels') },
-    { icon: FileSpreadsheet, text: t('auth.features.excel') },
-    { icon: BellRing, text: t('auth.features.alerts') },
+    { image: sectionImages.caja, text: t('auth.features.labels') },
+    { image: sectionImages.importar, text: t('auth.features.excel') },
+    { image: sectionImages.movimientos, text: t('auth.features.alerts') },
   ]
   return (
-    <aside className="relative hidden overflow-hidden border-r border-line bg-gradient-to-br from-[#0e1a33] via-[#0b1224] to-[#160d33] p-12 text-white shadow-[inset_0_0_120px_-40px_rgb(34_227_255/0.35)] lg:flex lg:flex-col lg:justify-between">
-      <Logo wordClassName="text-white" />
+    <aside className="relative hidden overflow-hidden border-r border-line bg-brand-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
+      <img src={sectionImages.bodega} alt="" className="pointer-events-none absolute inset-0 size-full object-cover" />
+      <div aria-hidden="true" className="absolute inset-0 bg-linear-to-b from-brand-950/85 via-brand-950/55 to-brand-950/90" />
+      <Logo className="relative" wordClassName="text-white" />
       <div className="relative flex max-w-md flex-col gap-6">
         <p className="text-4xl leading-tight font-extrabold tracking-tight">{t('auth.tagline')}</p>
         <ul className="flex flex-col gap-3">
-          {features.map(({ icon: Icon, text }) => (
-            <li key={text} className="flex items-center gap-3 text-lg text-brand-200">
-              <span className="grid size-10 place-items-center rounded-xl bg-white/10 text-accent-300">
-                <Icon aria-hidden="true" className="size-5" />
-              </span>
+          {features.map(({ image, text }) => (
+            <li key={text} className="flex items-center gap-3 text-lg text-ink">
+              <img src={image} alt="" width={48} height={48} className="size-12 rounded-xl object-cover" />
               {text}
             </li>
           ))}
         </ul>
       </div>
-      <p className="text-sm text-brand-200">{t('auth.footer')}</p>
+      <p className="relative text-sm text-ink/80">{t('auth.footer')}</p>
     </aside>
   )
 }

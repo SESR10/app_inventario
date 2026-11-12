@@ -1,7 +1,7 @@
-import { ArrowLeftRight, CircleDollarSign, Package, PackageX, Tag, TriangleAlert, type LucideIcon } from 'lucide-react'
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
+import { sectionImages, type SectionImage } from '../assets/secciones'
 import { useCompany } from '../company/context'
 import { PageHeading } from '../components/PageHeading'
 import { Alert } from '../components/ui/Alert'
@@ -29,20 +29,20 @@ interface Data {
 }
 
 const LOW_SHOWN = 10
-// Color de cada tarjeta del resumen (fondo del ícono / ícono).
+// Color de cada tarjeta del resumen: franja de arriba y cifra.
 const TONES = {
-  brand: 'bg-brand-100 text-brand-700',
-  amber: 'bg-accent-200 text-amber-800',
-  red: 'bg-red-100 text-danger',
-  green: 'bg-emerald-100 text-emerald-700',
-  sky: 'bg-sky-100 text-sky-700',
-  violet: 'bg-violet-100 text-violet-700',
+  brand: { bar: 'border-t-sky-700', text: 'text-sky-700' },
+  amber: { bar: 'border-t-accent-400', text: 'text-accent-400' },
+  red: { bar: 'border-t-danger', text: 'text-danger' },
+  green: { bar: 'border-t-emerald-700', text: 'text-emerald-700' },
+  sky: { bar: 'border-t-sky-700', text: 'text-sky-700' },
+  violet: { bar: 'border-t-violet-700', text: 'text-violet-700' },
 }
 
 interface Stat {
   label: string
   value: string
-  icon: LucideIcon
+  image: SectionImage
   tone: keyof typeof TONES
   href?: string
   alert?: boolean
@@ -82,14 +82,14 @@ export function DashboardPage() {
     {
       label: t('dashboard.products'),
       value: formatNumber(Number(s.products)),
-      icon: Package,
+      image: 'caja',
       tone: 'brand',
       href: '/productos',
     },
     {
       label: t('dashboard.lowStock'),
       value: formatNumber(Number(s.low_stock)),
-      icon: TriangleAlert,
+      image: 'movimientos',
       tone: 'amber',
       href: '/productos?bajo=1',
       alert: s.low_stock > 0,
@@ -97,26 +97,26 @@ export function DashboardPage() {
     {
       label: t('dashboard.outOfStock'),
       value: formatNumber(Number(s.out_of_stock)),
-      icon: PackageX,
+      image: 'caja',
       tone: 'red',
       alert: s.out_of_stock > 0,
     },
     {
       label: t('dashboard.stockCost'),
       value: formatMoney(Number(s.stock_cost)),
-      icon: CircleDollarSign,
+      image: 'panel',
       tone: 'green',
     },
     {
       label: t('dashboard.stockPrice'),
       value: formatMoney(Number(s.stock_price)),
-      icon: Tag,
+      image: 'panel',
       tone: 'sky',
     },
     {
       label: t('dashboard.movements7d'),
       value: formatNumber(Number(s.movements_7d)),
-      icon: ArrowLeftRight,
+      image: 'movimientos',
       tone: 'violet',
       href: '/movimientos',
     },
@@ -124,18 +124,26 @@ export function DashboardPage() {
 
   return (
     <section className="flex flex-col gap-6">
-      <div className="relative overflow-hidden rounded-2xl border border-line bg-gradient-to-br from-[#0e1a33] via-[#0b1224] to-[#120b2a] px-5 py-6 text-white shadow-[0_0_60px_-20px_rgb(139_92_246/0.6)] sm:px-8 sm:py-8">
-        <HeroBoxes />
+      <div className="relative overflow-hidden rounded-2xl border border-line bg-brand-950 px-5 py-7 text-white sm:px-10 sm:py-9">
+        {/* Foto de bodega de fondo, oscurecida hacia la izquierda para que el texto se lea. */}
+        <img
+          src={sectionImages.bodega}
+          alt=""
+          className="pointer-events-none absolute inset-0 size-full object-cover object-right"
+        />
+        <div aria-hidden="true" className="absolute inset-0 bg-linear-to-r from-brand-950 via-brand-950/80 to-brand-950/10" />
         <div className="relative flex max-w-xl flex-col gap-2">
-          <p className="font-semibold text-accent-300">{t('dashboard.greeting')}</p>
+          <p className="w-fit rounded-full bg-accent-200 px-3 py-1 text-sm font-semibold text-accent-300">
+            {t('dashboard.greeting')}
+          </p>
           <PageHeading title={title} className="text-white">
             {t('dashboard.welcome', { company: current?.company.name })}
           </PageHeading>
-          <p className="text-brand-200">{t('dashboard.heroText')}</p>
+          <p className="text-ink/85">{t('dashboard.heroText')}</p>
           {canEdit(current?.role) && (
             <nav
               aria-label={t('dashboard.quickActions')}
-              className="mt-3 flex flex-wrap gap-3 [&_*:focus-visible]:outline-accent-300"
+              className="mt-3 flex flex-wrap gap-3"
             >
               <LinkButton to="/movimientos/nuevo" variant="accent">
                 {t('movements.record')}
@@ -169,15 +177,17 @@ export function DashboardPage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className="relative flex min-h-20 flex-col-reverse justify-center gap-0.5 rounded-xl border border-line bg-surface py-4 pr-4 pl-20 shadow-sm"
+                className={`relative flex min-h-24 flex-col-reverse justify-center gap-0.5 rounded-2xl border border-t-4 border-line bg-surface py-4 pr-4 pl-24 shadow-sm transition-transform duration-200 motion-safe:hover:-translate-y-0.5 ${TONES[stat.tone].bar}`}
               >
                 <dt className="text-sm font-medium text-muted">
-                  {/* Ícono decorativo: dentro del término para que la lista siga siendo válida. */}
-                  <span
-                    className={`absolute top-1/2 left-4 grid size-12 -translate-y-1/2 place-items-center rounded-xl ${TONES[stat.tone]}`}
-                  >
-                    <stat.icon aria-hidden="true" className="size-6" />
-                  </span>
+                  {/* Foto decorativa: dentro del término para que la lista siga siendo válida. */}
+                  <img
+                    src={sectionImages[stat.image]}
+                    alt=""
+                    width={64}
+                    height={64}
+                    className="absolute top-1/2 left-4 size-16 -translate-y-1/2 rounded-xl object-cover"
+                  />
                   {stat.href ? (
                     <Link to={stat.href} className="underline-offset-2 hover:underline">
                       {stat.label}
@@ -187,7 +197,7 @@ export function DashboardPage() {
                   )}
                 </dt>
                 <dd
-                  className={`truncate text-2xl font-extrabold tabular-nums ${stat.alert ? 'text-danger' : 'text-ink'}`}
+                  className={`truncate text-2xl font-extrabold tabular-nums ${stat.alert ? 'text-danger' : TONES[stat.tone].text}`}
                 >
                   {stat.value}
                 </dd>
@@ -255,28 +265,5 @@ export function DashboardPage() {
         </div>
       )}
     </section>
-  )
-}
-
-// Cajas apiladas de adorno en el encabezado del panel.
-function HeroBoxes() {
-  const box = (x: number, y: number, s: number) => (
-    <g transform={`translate(${x} ${y}) scale(${s})`}>
-      <path d="M20 4 35 12 20 20 5 12Z" fill="#22e3ff" />
-      <path d="M5 12 20 20v16L5 28Z" fill="#a78bfa" />
-      <path d="M35 12 20 20v16l15-8Z" fill="#4f46e5" />
-    </g>
-  )
-  return (
-    <svg
-      viewBox="0 0 200 160"
-      aria-hidden="true"
-      className="pointer-events-none absolute -right-6 -bottom-6 hidden w-72 opacity-90 drop-shadow-[0_0_24px_rgb(34_227_255/0.45)] xl:block"
-    >
-      {box(40, 70, 2)}
-      {box(100, 70, 2)}
-      {box(70, 25, 2)}
-      {box(140, 100, 1.2)}
-    </svg>
   )
 }
