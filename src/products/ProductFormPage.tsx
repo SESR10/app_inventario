@@ -403,7 +403,7 @@ export function ProductFormPage() {
                     : `${formatNumber(product?.stock ?? 0)} ${product?.unit}`}
                 </span>
                 {editable && (
-                  <Link to={`/movimientos/nuevo?producto=${id}`} className="text-brand-700 underline">
+                  <Link to={`/movimientos/nuevo?producto=${id}`} className="text-ink underline">
                     {t('products.recordMovement')}
                   </Link>
                 )}

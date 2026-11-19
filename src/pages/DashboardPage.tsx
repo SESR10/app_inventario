@@ -29,23 +29,11 @@ interface Data {
 }
 
 const LOW_SHOWN = 10
-// Color de cada tarjeta del resumen: franja de arriba y cifra.
-const TONES = {
-  brand: { bar: 'border-t-sky-700', text: 'text-sky-700' },
-  amber: { bar: 'border-t-accent-400', text: 'text-accent-400' },
-  red: { bar: 'border-t-danger', text: 'text-danger' },
-  green: { bar: 'border-t-emerald-700', text: 'text-emerald-700' },
-  sky: { bar: 'border-t-sky-700', text: 'text-sky-700' },
-  violet: { bar: 'border-t-violet-700', text: 'text-violet-700' },
-}
-
 interface Stat {
   label: string
   value: string
   image: SectionImage
-  tone: keyof typeof TONES
   href?: string
-  alert?: boolean
 }
 const RECENT_SHOWN = 5
 
@@ -83,41 +71,33 @@ export function DashboardPage() {
       label: t('dashboard.products'),
       value: formatNumber(Number(s.products)),
       image: 'caja',
-      tone: 'brand',
       href: '/productos',
     },
     {
       label: t('dashboard.lowStock'),
       value: formatNumber(Number(s.low_stock)),
       image: 'movimientos',
-      tone: 'amber',
       href: '/productos?bajo=1',
-      alert: s.low_stock > 0,
     },
     {
       label: t('dashboard.outOfStock'),
       value: formatNumber(Number(s.out_of_stock)),
       image: 'caja',
-      tone: 'red',
-      alert: s.out_of_stock > 0,
     },
     {
       label: t('dashboard.stockCost'),
       value: formatMoney(Number(s.stock_cost)),
       image: 'panel',
-      tone: 'green',
     },
     {
       label: t('dashboard.stockPrice'),
       value: formatMoney(Number(s.stock_price)),
       image: 'panel',
-      tone: 'sky',
     },
     {
       label: t('dashboard.movements7d'),
       value: formatNumber(Number(s.movements_7d)),
       image: 'movimientos',
-      tone: 'violet',
       href: '/movimientos',
     },
   ]
@@ -133,7 +113,7 @@ export function DashboardPage() {
         />
         <div aria-hidden="true" className="absolute inset-0 bg-linear-to-r from-brand-950 via-brand-950/80 to-brand-950/10" />
         <div className="relative flex max-w-xl flex-col gap-2">
-          <p className="w-fit rounded-full bg-accent-200 px-3 py-1 text-sm font-semibold text-accent-300">
+          <p className="w-fit rounded-full bg-accent-200 px-3 py-1 text-sm font-semibold text-ink">
             {t('dashboard.greeting')}
           </p>
           <PageHeading title={title} className="text-white">
@@ -177,9 +157,9 @@ export function DashboardPage() {
             {stats.map((stat) => (
               <div
                 key={stat.label}
-                className={`relative flex min-h-24 flex-col-reverse justify-center gap-0.5 rounded-2xl border border-t-4 border-line bg-surface py-4 pr-4 pl-24 shadow-sm transition-transform duration-200 motion-safe:hover:-translate-y-0.5 ${TONES[stat.tone].bar}`}
+                className="relative flex min-h-24 flex-col justify-center gap-1 rounded-2xl border border-line bg-surface py-4 pr-4 pl-24 shadow-sm transition-transform duration-200 motion-safe:hover:-translate-y-0.5"
               >
-                <dt className="text-sm font-medium text-muted">
+                <dt className="text-base font-semibold text-ink">
                   {/* Foto decorativa: dentro del término para que la lista siga siendo válida. */}
                   <img
                     src={sectionImages[stat.image]}
@@ -197,7 +177,7 @@ export function DashboardPage() {
                   )}
                 </dt>
                 <dd
-                  className={`truncate text-2xl font-extrabold tabular-nums ${stat.alert ? 'text-danger' : TONES[stat.tone].text}`}
+                  className="truncate text-2xl font-bold text-ink tabular-nums"
                 >
                   {stat.value}
                 </dd>
@@ -215,7 +195,7 @@ export function DashboardPage() {
                 {t('dashboard.lowStockTitle')}
               </h2>
               {data.low.length > 0 && (
-                <Link to="/productos?bajo=1" className="text-brand-700 underline">
+                <Link to="/productos?bajo=1" className="text-ink underline">
                   {t('dashboard.seeAll')}
                 </Link>
               )}
@@ -228,11 +208,11 @@ export function DashboardPage() {
                   <li key={p.id} className="flex flex-wrap items-center justify-between gap-x-3 px-3 py-2">
                     <Link
                       to={`/productos/${p.id}`}
-                      className="font-medium text-brand-700 underline-offset-2 hover:underline"
+                      className="font-medium text-ink underline-offset-2 hover:underline"
                     >
                       {p.name}
                     </Link>
-                    <span className="text-sm font-medium text-danger">
+                    <span className="text-sm text-ink">
                       {t('dashboard.stockOf', {
                         stock: formatNumber(p.stock),
                         min: formatNumber(p.min_stock),
@@ -251,7 +231,7 @@ export function DashboardPage() {
                 {t('dashboard.recentTitle')}
               </h2>
               {data.recent.length > 0 && (
-                <Link to="/movimientos" className="text-brand-700 underline">
+                <Link to="/movimientos" className="text-ink underline">
                   {t('dashboard.seeAll')}
                 </Link>
               )}

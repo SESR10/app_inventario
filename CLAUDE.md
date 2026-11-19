@@ -118,3 +118,7 @@ grandes, facilidad de uso y apariencia profesional.
   webp generadas en Figma). Tema grafito cálido con acento ámbar sólido (`btn-solid`, `btn-soft`), sin degradados neón,
   brillos ni cuadrícula; títulos sin Space Grotesk. Bienvenida del panel e ingreso con foto de bodega.
 
+- Ajustes de clase (2026-11-19, el profesor dijo que las tarjetas de colores se ven "muy IA"): textos y enlaces en blanco
+  (`text-ink`, `--color-muted` más claro), tarjetas del panel con título arriba y cifra en blanco, sin franjas ni números de
+  color. Botón flotante del asistente de WhatsApp (`src/components/WhatsAppButton.tsx`): solo muestra "Próximamente", sin
+  conexión a WhatsApp todavía.

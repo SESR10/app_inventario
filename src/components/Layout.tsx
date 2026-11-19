@@ -6,6 +6,7 @@ import { useAuth } from '../auth/context'
 import { useCompany } from '../company/context'
 import { sectionImages } from '../assets/secciones'
 import { Logo } from './Logo'
+import { WhatsAppButton } from './WhatsAppButton'
 
 const links = [
   { to: '/', key: 'dashboard', image: sectionImages.panel, end: true },
@@ -47,7 +48,7 @@ export function Layout() {
                     id={companySelectId}
                     value={current.company.id}
                     onChange={(e) => select(e.target.value)}
-                    className="min-h-11 w-full max-w-48 min-w-0 truncate rounded-lg border border-slate-500 bg-surface px-2 font-semibold text-brand-700"
+                    className="min-h-11 w-full max-w-48 min-w-0 truncate rounded-lg border border-slate-500 bg-surface px-2 font-semibold text-ink"
                   >
                     {memberships.map((m) => (
                       <option key={m.company.id} value={m.company.id}>
@@ -57,7 +58,7 @@ export function Layout() {
                   </select>
                 </>
               ) : (
-                <span className="truncate font-semibold text-brand-700">{current.company.name}</span>
+                <span className="truncate font-semibold text-ink">{current.company.name}</span>
               )}
             </div>
           )}
@@ -77,7 +78,7 @@ export function Layout() {
                     `group flex min-h-14 flex-col items-center justify-center gap-1 rounded-xl px-1 text-xs font-semibold transition-all duration-200 ease-out motion-safe:hover:-translate-y-0.5 md:min-h-12 md:flex-row md:gap-2.5 md:py-1.5 md:pr-4 md:pl-1.5 md:text-sm ${
                       isActive
                         ? 'btn-solid shadow-lg shadow-black/40'
-                        : 'text-muted hover:bg-slate-100 hover:text-ink hover:shadow-lg hover:shadow-black/40'
+                        : 'text-ink hover:bg-slate-100 hover:shadow-lg hover:shadow-black/40'
                     }`
                   }
                 >
@@ -113,6 +114,7 @@ export function Layout() {
           </Suspense>
         </div>
       </main>
+      <WhatsAppButton />
     </div>
   )
 }

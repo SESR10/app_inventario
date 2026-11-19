@@ -81,7 +81,7 @@ export function MovementsPage() {
       {productId && product && (
         <p className="flex flex-wrap items-center gap-x-3">
           <span className="font-medium">{t('movements.productFilter', { name: product.name, sku: product.sku })}</span>
-          <Link to="/movimientos" className="text-brand-700 underline">
+          <Link to="/movimientos" className="text-ink underline">
             {t('movements.allProducts')}
           </Link>
         </p>
