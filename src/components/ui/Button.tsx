@@ -10,7 +10,7 @@ const variants: Record<Variant, string> = {
     'btn-solid hover:-translate-y-0.5 hover:brightness-110 hover:shadow-lg hover:shadow-black/40 active:translate-y-0 disabled:translate-y-0 disabled:bg-slate-300 disabled:text-muted disabled:shadow-none',
   secondary:
     'btn-soft hover:-translate-y-0.5 hover:border-slate-500 hover:shadow-lg hover:shadow-black/40 active:translate-y-0 disabled:translate-y-0 disabled:text-muted disabled:shadow-none',
-  ghost: 'text-brand-700 underline-offset-4 hover:underline disabled:text-muted',
+  ghost: 'text-ink underline-offset-4 hover:underline disabled:text-muted',
   danger:
     'border border-danger/60 bg-danger/10 text-danger hover:-translate-y-px hover:bg-danger hover:text-[#1a0505] hover:shadow-lg hover:shadow-black/40 disabled:translate-y-0 disabled:bg-slate-400',
 }

@@ -7,7 +7,7 @@ export function NotFoundPage() {
   return (
     <section className="flex flex-col gap-4">
       <PageHeading title={t('notFound.title')}>{t('notFound.title')}</PageHeading>
-      <Link to="/" className="text-brand-700 underline">
+      <Link to="/" className="text-ink underline">
         {t('notFound.back')}
       </Link>
     </section>

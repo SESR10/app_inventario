@@ -77,7 +77,7 @@ export function ProductList({ rows, total, hasMore, loading, selected, onToggle,
                   />
                   <div className="flex min-w-0 flex-1 flex-col gap-0.5 sm:flex-row sm:items-center sm:gap-4">
                     <div className="min-w-0 flex-1">
-                      <Link to={`/productos/${row.id}`} className="font-semibold text-brand-700 underline-offset-2 hover:underline">
+                      <Link to={`/productos/${row.id}`} className="font-semibold text-ink underline-offset-2 hover:underline">
                         {row.name}
                       </Link>
                       {row.is_kit && (

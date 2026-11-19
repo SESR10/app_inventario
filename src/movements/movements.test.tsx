@@ -155,7 +155,7 @@ describe('Panel', () => {
     const { client, container } = setup('/')
     expect(await screen.findByText('Tienes 1 producto con stock bajo.')).toBeInTheDocument()
     const stats = screen.getByRole('region', { name: 'Resumen del inventario' })
-    expect(within(stats).getByText('Agotados').closest('div')).toHaveTextContent('0')
+    expect(within(stats).getByText('Productos agotados').closest('div')).toHaveTextContent('0')
     expect(within(stats).getByText('Valor del inventario (costo)').closest('div')).toHaveTextContent('36.000,00')
     expect(screen.getByText('2 de mínimo 5 unidad')).toBeInTheDocument()
     expect(screen.getByRole('list', { name: 'Últimos movimientos' })).toBeInTheDocument()

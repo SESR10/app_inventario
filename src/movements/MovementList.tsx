@@ -21,7 +21,7 @@ export function MovementList({ rows, label }: { rows: Movement[]; label: string 
             </time>
           </div>
           <div className="min-w-0 flex-1">
-            <Link to={`/productos/${m.product_id}`} className="font-semibold text-brand-700 underline-offset-2 hover:underline">
+            <Link to={`/productos/${m.product_id}`} className="font-semibold text-ink underline-offset-2 hover:underline">
               {m.product_name}
             </Link>
             <span className="text-sm text-muted"> · {m.product_sku}</span>
