@@ -118,7 +118,7 @@ export function DashboardPage() {
             {t('dashboard.greeting')}
           </p>
           <PageHeading title={title} className="text-white">
-            {t('dashboard.welcome', { company: current?.company.name })}
+            {t('dashboard.welcome')}
           </PageHeading>
           <p className="text-ink/85">{t('dashboard.heroText')}</p>
           {canEdit(current?.role) && (

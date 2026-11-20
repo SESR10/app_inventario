@@ -38,30 +38,24 @@ export function Layout() {
       <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-surface px-4 py-2 print:hidden md:gap-4 md:px-6 md:py-3">
         <div className="flex min-w-0 items-center gap-3">
           <Logo className="shrink-0" wordClassName="md:max-xl:sr-only" />
-          {current && (
+          {/* Solo con varias empresas aparece el selector; con una sola no se muestra su nombre. */}
+          {current && memberships.length > 1 && (
             <div className="flex min-w-0 flex-col md:max-lg:hidden">
-              <span className="hidden text-xs font-semibold text-muted xl:block">{t('nav.company')}</span>
-              {memberships.length > 1 ? (
-                <>
-                  <label htmlFor={companySelectId} className="sr-only">
-                    {t('company.select')}
-                  </label>
-                  <select
-                    id={companySelectId}
-                    value={current.company.id}
-                    onChange={(e) => select(e.target.value)}
-                    className="min-h-11 w-full max-w-48 min-w-0 truncate rounded-lg border border-slate-500 bg-surface px-2 font-semibold text-ink"
-                  >
-                    {memberships.map((m) => (
-                      <option key={m.company.id} value={m.company.id}>
-                        {m.company.name}
-                      </option>
-                    ))}
-                  </select>
-                </>
-              ) : (
-                <span className="truncate font-semibold text-ink">{current.company.name}</span>
-              )}
+              <label htmlFor={companySelectId} className="sr-only">
+                {t('company.select')}
+              </label>
+              <select
+                id={companySelectId}
+                value={current.company.id}
+                onChange={(e) => select(e.target.value)}
+                className="min-h-11 w-full max-w-48 min-w-0 truncate rounded-lg border border-slate-500 bg-surface px-2 font-semibold text-ink"
+              >
+                {memberships.map((m) => (
+                  <option key={m.company.id} value={m.company.id}>
+                    {m.company.name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </div>

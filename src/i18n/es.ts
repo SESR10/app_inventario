@@ -24,7 +24,6 @@ const es = {
     import: 'Importar y exportar',
     team: 'Equipo',
     signOut: 'Cerrar sesión',
-    company: 'Empresa',
     scan: 'Escanear',
   },
   // Nombres cortos para el menú inferior del celular.
@@ -74,7 +73,7 @@ const es = {
   dashboard: {
     title: 'Panel',
     greeting: '¡Hola de nuevo!',
-    welcome: 'Resumen de {{company}}',
+    welcome: 'Resumen de tu inventario',
     heroText: 'Así va tu inventario hoy. Registra entradas y salidas para mantenerlo al día.',
     loadError: 'No pudimos cargar el resumen. Intenta de nuevo.',
     statsLabel: 'Resumen del inventario',
