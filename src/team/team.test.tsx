@@ -53,7 +53,7 @@ describe('Equipo', () => {
     await user.type(email, 'Dani@Empresa.com')
     await user.selectOptions(screen.getByLabelText('Rol'), 'Solo lectura')
     await user.click(screen.getByRole('button', { name: 'Invitar' }))
-    expect(await screen.findByText(/dani@empresa.com aún no tiene cuenta/)).toBeInTheDocument()
+    expect(await screen.findByText(/invitamos a dani@empresa.com/)).toBeInTheDocument()
     expect(client.rpc).toHaveBeenCalledWith('invite_member', { p_company: 'c1', p_email: 'dani@empresa.com', p_role: 'viewer' })
 
     await user.selectOptions(screen.getByLabelText('Rol de beto@empresa.com'), 'Editor')

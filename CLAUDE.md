@@ -131,3 +131,13 @@ grandes, facilidad de uso y apariencia profesional.
   solo el selector si la persona tiene varias; panel "Resumen de tu inventario"): logo SVG propio (anillo de 360°
   con flecha alrededor de una caja) y palabra "STOCK360", favicon. Íconos propios en SVG (`src/components/SectionIcon.tsx`,
   forma en ámbar + trazo claro sobre baldosa) en menú, tarjetas del panel e ingreso; solo queda la foto de bodega.
+- Ley colombiana y seguridad (2026-11-20): páginas públicas `/privacidad`, `/terminos`, `/cookies` (`src/legal`, textos en
+  `content.es.ts`; datos del responsable en `src/legal/config.ts`, vacíos se ven "(pendiente)"). Casilla de autorización
+  (Ley 1581) al crear cuenta: `legal_version` va en los metadatos y un trigger en auth.users la guarda en `legal_consents`;
+  `ConsentGate` pide aceptar a cuentas sin la versión actual (`legal_pending`, `accept_legal`; si la consulta falla no
+  bloquea). Aviso de cookies informativo (solo almacenamiento necesario). "¿Olvidaste tu contraseña?" y contraseña nueva
+  (evento PASSWORD_RECOVERY), contraseñas con letras y números, pausa de 1 minuto tras 5 intentos fallidos. Migración
+  `20261120000000_legal_y_seguridad.sql`: anon sin permisos en funciones ni tablas, `invite_member` siempre deja invitación
+  (no revela si el correo tiene cuenta), sin política de insertar miembros directo, límites de largo en textos.
+  `vercel.json` con cabeceras (CSP, HSTS, X-Frame-Options, Permissions-Policy con cámara solo para la app). Al cambiar
+  términos, subir `LEGAL_VERSION`.
