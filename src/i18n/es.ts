@@ -1,7 +1,7 @@
 // Textos en español. Para otro idioma, crea un archivo con las mismas claves y regístralo en index.ts.
 const es = {
   app: {
-    name: 'Inventario',
+    name: 'STOCK 360',
     skipToContent: 'Saltar al contenido principal',
     loading: 'Cargando…',
   },

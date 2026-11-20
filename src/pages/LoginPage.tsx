@@ -1,4 +1,5 @@
 import { sectionImages } from '../assets/secciones'
+import { SectionIcon, type IconName } from '../components/SectionIcon'
 import { useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Logo } from '../components/Logo'
@@ -121,22 +122,22 @@ export function LoginPage() {
 // Presentación de la app al lado del formulario (solo en pantallas grandes).
 function BrandPanel() {
   const { t } = useTranslation()
-  const features = [
-    { image: sectionImages.caja, text: t('auth.features.labels') },
-    { image: sectionImages.importar, text: t('auth.features.excel') },
-    { image: sectionImages.movimientos, text: t('auth.features.alerts') },
+  const features: { icon: IconName; text: string }[] = [
+    { icon: 'labels', text: t('auth.features.labels') },
+    { icon: 'import', text: t('auth.features.excel') },
+    { icon: 'low', text: t('auth.features.alerts') },
   ]
   return (
     <aside className="relative hidden overflow-hidden border-r border-line bg-brand-950 p-12 text-white lg:flex lg:flex-col lg:justify-between">
       <img src={sectionImages.bodega} alt="" className="pointer-events-none absolute inset-0 size-full object-cover" />
       <div aria-hidden="true" className="absolute inset-0 bg-linear-to-b from-brand-950/85 via-brand-950/55 to-brand-950/90" />
-      <Logo className="relative" wordClassName="text-white" />
+      <Logo className="relative" />
       <div className="relative flex max-w-md flex-col gap-6">
         <p className="text-4xl leading-tight font-extrabold tracking-tight">{t('auth.tagline')}</p>
         <ul className="flex flex-col gap-3">
-          {features.map(({ image, text }) => (
+          {features.map(({ icon, text }) => (
             <li key={text} className="flex items-center gap-3 text-lg text-ink">
-              <img src={image} alt="" width={48} height={48} className="size-12 rounded-xl object-cover" />
+              <SectionIcon name={icon} className="size-12" />
               {text}
             </li>
           ))}

@@ -47,7 +47,7 @@ describe('App', () => {
     expect(await screen.findByRole('heading', { name: 'Resumen de Ferretería Sol' })).toHaveFocus()
     expect(screen.getByRole('navigation', { name: 'Menú principal' })).toBeInTheDocument()
     expect(screen.getByRole('link', { name: 'Saltar al contenido principal' })).toHaveAttribute('href', '#contenido')
-    expect(document.title).toBe('Panel · Inventario')
+    expect(document.title).toBe('Panel · STOCK 360')
     expect((await axe(container)).violations).toEqual([])
   })
 })

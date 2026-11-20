@@ -1,10 +1,5 @@
-// Fotos de cada sección (generadas en Figma, archivo "App Inventario - Rediseño"). Reemplazan los íconos de línea.
+// Foto de bodega para la bienvenida del panel y el ingreso (generada en Figma, archivo "App Inventario - Rediseño").
+// Las secciones usan íconos propios (src/components/SectionIcon.tsx).
 import bodega from './bodega.webp'
-import caja from './caja.webp'
-import equipo from './equipo.webp'
-import importar from './importar.webp'
-import movimientos from './movimientos.webp'
-import panel from './panel.webp'
 
-export const sectionImages = { panel, caja, movimientos, importar, equipo, bodega }
-export type SectionImage = keyof typeof sectionImages
+export const sectionImages = { bodega }
