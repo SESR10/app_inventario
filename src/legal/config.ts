@@ -3,14 +3,14 @@
 // mientras estén vacíos, las páginas legales muestran "(pendiente)".
 export const RESPONSABLE = {
   // Nombre completo (persona natural) o razón social (empresa, por ejemplo "STOCK 360 S.A.S.").
-  nombre: '',
+  nombre: 'Santiago Sabogal Roa',
   // Cédula o NIT.
-  documento: '',
-  direccion: '',
-  ciudad: '',
+  documento: 'Cc 1006778137',
+  direccion: 'calle 1 #24-03',
+  ciudad: 'Villavicencio',
   // Correo para consultas y reclamos sobre datos personales.
-  correo: '',
-  telefono: '',
+  correo: 'santiagosabogal100@gmail.com',
+  telefono: '3116511263',
 }
 
 // Cambia la versión cuando cambien los términos o la política: a quien ya tenía cuenta
