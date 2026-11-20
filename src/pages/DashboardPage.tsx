@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { Link } from 'react-router-dom'
-import { sectionImages, type SectionImage } from '../assets/secciones'
+import { sectionImages } from '../assets/secciones'
+import { SectionIcon, type IconName } from '../components/SectionIcon'
 import { useCompany } from '../company/context'
 import { PageHeading } from '../components/PageHeading'
 import { Alert } from '../components/ui/Alert'
@@ -32,7 +33,7 @@ const LOW_SHOWN = 10
 interface Stat {
   label: string
   value: string
-  image: SectionImage
+  icon: IconName
   href?: string
 }
 const RECENT_SHOWN = 5
@@ -70,34 +71,34 @@ export function DashboardPage() {
     {
       label: t('dashboard.products'),
       value: formatNumber(Number(s.products)),
-      image: 'caja',
+      icon: 'products',
       href: '/productos',
     },
     {
       label: t('dashboard.lowStock'),
       value: formatNumber(Number(s.low_stock)),
-      image: 'movimientos',
+      icon: 'low',
       href: '/productos?bajo=1',
     },
     {
       label: t('dashboard.outOfStock'),
       value: formatNumber(Number(s.out_of_stock)),
-      image: 'caja',
+      icon: 'out',
     },
     {
       label: t('dashboard.stockCost'),
       value: formatMoney(Number(s.stock_cost)),
-      image: 'panel',
+      icon: 'cost',
     },
     {
       label: t('dashboard.stockPrice'),
       value: formatMoney(Number(s.stock_price)),
-      image: 'panel',
+      icon: 'price',
     },
     {
       label: t('dashboard.movements7d'),
       value: formatNumber(Number(s.movements_7d)),
-      image: 'movimientos',
+      icon: 'week',
       href: '/movimientos',
     },
   ]
@@ -117,7 +118,7 @@ export function DashboardPage() {
             {t('dashboard.greeting')}
           </p>
           <PageHeading title={title} className="text-white">
-            {t('dashboard.welcome', { company: current?.company.name })}
+            {t('dashboard.welcome')}
           </PageHeading>
           <p className="text-ink/85">{t('dashboard.heroText')}</p>
           {canEdit(current?.role) && (
@@ -160,14 +161,8 @@ export function DashboardPage() {
                 className="relative flex min-h-24 flex-col justify-center gap-1 rounded-2xl border border-line bg-surface py-4 pr-4 pl-24 shadow-sm transition-transform duration-200 motion-safe:hover:-translate-y-0.5"
               >
                 <dt className="text-base font-semibold text-ink">
-                  {/* Foto decorativa: dentro del término para que la lista siga siendo válida. */}
-                  <img
-                    src={sectionImages[stat.image]}
-                    alt=""
-                    width={64}
-                    height={64}
-                    className="absolute top-1/2 left-4 size-16 -translate-y-1/2 rounded-xl object-cover"
-                  />
+                  {/* Ícono decorativo: dentro del término para que la lista siga siendo válida. */}
+                  <SectionIcon name={stat.icon} className="absolute top-1/2 left-4 size-16 -translate-y-1/2" />
                   {stat.href ? (
                     <Link to={stat.href} className="underline-offset-2 hover:underline">
                       {stat.label}

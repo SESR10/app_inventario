@@ -4,21 +4,21 @@ import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/context'
 import { useCompany } from '../company/context'
-import { sectionImages } from '../assets/secciones'
 import { Logo } from './Logo'
 import { ScanGlyph } from './ScanGlyph'
+import { SectionIcon } from './SectionIcon'
 import { WhatsAppButton } from './WhatsAppButton'
 
 const links = [
-  { to: '/', key: 'dashboard', image: sectionImages.panel, end: true },
-  { to: '/productos', key: 'products', image: sectionImages.caja },
-  { to: '/movimientos', key: 'movements', image: sectionImages.movimientos },
-  { to: '/importar', key: 'import', image: sectionImages.importar },
-  { to: '/equipo', key: 'team', image: sectionImages.equipo },
+  { to: '/', key: 'dashboard', icon: 'panel', end: true },
+  { to: '/productos', key: 'products', icon: 'products' },
+  { to: '/movimientos', key: 'movements', icon: 'movements' },
+  { to: '/importar', key: 'import', icon: 'import' },
+  { to: '/equipo', key: 'team', icon: 'team' },
 ] as const
 
 // Celular: barra superior y menú fijo abajo, al alcance del pulgar.
-// Escritorio: una sola barra arriba con el menú en pestañas con foto (se levantan al pasar el mouse).
+// Escritorio: una sola barra arriba con el menú en pestañas con ícono (se levantan al pasar el mouse).
 export function Layout() {
   const { t } = useTranslation()
   const { signOut } = useAuth()
@@ -37,31 +37,25 @@ export function Layout() {
 
       <header className="sticky top-0 z-30 flex items-center gap-3 border-b border-line bg-surface px-4 py-2 print:hidden md:gap-4 md:px-6 md:py-3">
         <div className="flex min-w-0 items-center gap-3">
-          <Logo className="shrink-0" wordClassName="sr-only xl:not-sr-only text-ink" />
-          {current && (
+          <Logo className="shrink-0" wordClassName="md:max-xl:sr-only" />
+          {/* Solo con varias empresas aparece el selector; con una sola no se muestra su nombre. */}
+          {current && memberships.length > 1 && (
             <div className="flex min-w-0 flex-col md:max-lg:hidden">
-              <span className="hidden text-xs font-semibold text-muted xl:block">{t('nav.company')}</span>
-              {memberships.length > 1 ? (
-                <>
-                  <label htmlFor={companySelectId} className="sr-only">
-                    {t('company.select')}
-                  </label>
-                  <select
-                    id={companySelectId}
-                    value={current.company.id}
-                    onChange={(e) => select(e.target.value)}
-                    className="min-h-11 w-full max-w-48 min-w-0 truncate rounded-lg border border-slate-500 bg-surface px-2 font-semibold text-ink"
-                  >
-                    {memberships.map((m) => (
-                      <option key={m.company.id} value={m.company.id}>
-                        {m.company.name}
-                      </option>
-                    ))}
-                  </select>
-                </>
-              ) : (
-                <span className="truncate font-semibold text-ink">{current.company.name}</span>
-              )}
+              <label htmlFor={companySelectId} className="sr-only">
+                {t('company.select')}
+              </label>
+              <select
+                id={companySelectId}
+                value={current.company.id}
+                onChange={(e) => select(e.target.value)}
+                className="min-h-11 w-full max-w-48 min-w-0 truncate rounded-lg border border-slate-500 bg-surface px-2 font-semibold text-ink"
+              >
+                {memberships.map((m) => (
+                  <option key={m.company.id} value={m.company.id}>
+                    {m.company.name}
+                  </option>
+                ))}
+              </select>
             </div>
           )}
         </div>
@@ -71,7 +65,7 @@ export function Layout() {
           className="fixed inset-x-0 bottom-0 z-30 border-t border-line bg-surface pb-[env(safe-area-inset-bottom)] shadow-[0_-6px_20px_rgb(0_0_0/0.35)] md:static md:mx-auto md:rounded-2xl md:border md:bg-slate-50 md:p-1.5 md:pb-1.5 md:shadow-none"
         >
           <ul className="grid grid-cols-5 gap-1 px-1 py-1.5 md:flex md:gap-1 md:p-0">
-            {links.map(({ to, key, image, ...rest }) => (
+            {links.map(({ to, key, icon, ...rest }) => (
               <li key={to}>
                 <NavLink
                   to={to}
@@ -84,12 +78,9 @@ export function Layout() {
                     }`
                   }
                 >
-                  <img
-                    src={image}
-                    alt=""
-                    width={36}
-                    height={36}
-                    className="size-7 shrink-0 rounded-lg object-cover ring-1 ring-black/30 transition-transform duration-200 ease-out group-hover:scale-110 group-aria-[current=page]:ring-2 group-aria-[current=page]:ring-white/70 md:size-8 xl:size-9"
+                  <SectionIcon
+                    name={icon}
+                    className="size-8 transition-transform duration-200 ease-out group-hover:scale-110 group-aria-[current=page]:ring-2 group-aria-[current=page]:ring-white/70 xl:size-9"
                   />
                   <span className="xl:hidden">{t(`navShort.${key}`)}</span>
                   <span className="hidden xl:inline">{t(`nav.${key}`)}</span>

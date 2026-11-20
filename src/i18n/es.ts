@@ -1,7 +1,7 @@
 // Textos en español. Para otro idioma, crea un archivo con las mismas claves y regístralo en index.ts.
 const es = {
   app: {
-    name: 'Inventario',
+    name: 'STOCK 360',
     skipToContent: 'Saltar al contenido principal',
     loading: 'Cargando…',
   },
@@ -24,7 +24,6 @@ const es = {
     import: 'Importar y exportar',
     team: 'Equipo',
     signOut: 'Cerrar sesión',
-    company: 'Empresa',
     scan: 'Escanear',
   },
   // Nombres cortos para el menú inferior del celular.
@@ -74,7 +73,7 @@ const es = {
   dashboard: {
     title: 'Panel',
     greeting: '¡Hola de nuevo!',
-    welcome: 'Resumen de {{company}}',
+    welcome: 'Resumen de tu inventario',
     heroText: 'Así va tu inventario hoy. Registra entradas y salidas para mantenerlo al día.',
     loadError: 'No pudimos cargar el resumen. Intenta de nuevo.',
     statsLabel: 'Resumen del inventario',
@@ -637,7 +636,7 @@ const es = {
       category: 'Herramientas',
       unit: 'unidad',
       location: 'Bodega principal',
-      supplier: 'Ferretería Central',
+      supplier: 'Distribuidora Central',
       package: 'Caja',
     },
     instructions: [

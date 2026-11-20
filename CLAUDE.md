@@ -127,4 +127,7 @@ grandes, facilidad de uso y apariencia profesional.
   `find_code` (SKU o código de presentación) y muestra ficha rápida: stock con estado y en cajas, precios (costo solo para
   editores), ubicación, presentaciones, otros datos; botones entrada/salida (`/movimientos/nuevo?producto&tipo&presentacion`),
   código desconocido → crear producto con `?sku=`. Ingreso manual (sirve con lector USB) y escaneados recientes. Botón
-  "Escanear" flotante en celular y en la barra en escritorio. Logo propio en SVG (etiqueta con código calado) y favicon.
+  "Escanear" flotante en celular y en la barra en escritorio. Marca STOCK 360 (`app.name`; el nombre de la empresa no se muestra,
+  solo el selector si la persona tiene varias; panel "Resumen de tu inventario"): logo SVG propio (anillo de 360°
+  con flecha alrededor de una caja) y palabra "STOCK360", favicon. Íconos propios en SVG (`src/components/SectionIcon.tsx`,
+  forma en ámbar + trazo claro sobre baldosa) en menú, tarjetas del panel e ingreso; solo queda la foto de bodega.
