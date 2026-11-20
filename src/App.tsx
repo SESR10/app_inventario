@@ -21,6 +21,8 @@ import { TeamPage } from './team/TeamPage'
 
 // Páginas con librerías pesadas (códigos de barras, Excel): se descargan solo al abrirlas.
 const LabelsPage = lazy(() => import('./products/LabelsPage').then((m) => ({ default: m.LabelsPage })))
+// El escáner trae su lector de códigos (para celulares sin lector propio) solo al abrirlo.
+const ScanPage = lazy(() => import('./scan/ScanPage').then((m) => ({ default: m.ScanPage })))
 const ImportExportPage = lazy(() =>
   import('./importExport/ImportExportPage').then((m) => ({ default: m.ImportExportPage })),
 )
@@ -65,6 +67,7 @@ function CompanyGate() {
         <Route path="etiquetas" element={<LabelsPage />} />
         <Route path="movimientos" element={<MovementsPage />} />
         <Route path="movimientos/nuevo" element={<MovementFormPage />} />
+        <Route path="escanear" element={<ScanPage />} />
         <Route path="equipo" element={<TeamPage />} />
         <Route path="importar" element={<ImportExportPage />} />
         <Route path="*" element={<NotFoundPage />} />

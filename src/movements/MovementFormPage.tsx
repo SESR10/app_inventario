@@ -34,11 +34,16 @@ export function MovementFormPage() {
   const companyId = current!.company.id
   const [params] = useSearchParams()
   const presetId = params.get('producto')
+  // Desde el escáner: presentación escaneada (?presentacion=id) y tipo de movimiento (?tipo=out).
+  const presetPackage = params.get('presentacion')
+  const presetType = params.get('tipo')
 
   const [product, setProduct] = useState<PickedProduct | null>(null)
   const [details, setDetails] = useState<Details | null>(null)
   const [packageId, setPackageId] = useState('')
-  const [type, setType] = useState<MovementType>('in')
+  const [type, setType] = useState<MovementType>(
+    TYPES.includes(presetType as MovementType) ? (presetType as MovementType) : 'in',
+  )
   const [quantity, setQuantity] = useState('')
   const [reason, setReason] = useState('')
   const [errors, setErrors] = useState<Errors>({})
@@ -58,8 +63,8 @@ export function MovementFormPage() {
   // Producto elegido desde su ficha (?producto=id).
   useEffect(() => {
     if (!presetId) return
-    void getProduct(client, presetId).then((p) => p && choose(p))
-  }, [client, presetId])
+    void getProduct(client, presetId).then((p) => p && choose(p, presetPackage))
+  }, [client, presetId, presetPackage])
 
   // Presentaciones (o piezas, si es un kit) del producto elegido.
   const productId = product?.id

@@ -122,3 +122,9 @@ grandes, facilidad de uso y apariencia profesional.
   (`text-ink`, `--color-muted` más claro), tarjetas del panel con título arriba y cifra en blanco, sin franjas ni números de
   color. Botón flotante del asistente de WhatsApp (`src/components/WhatsAppButton.tsx`): solo muestra "Próximamente", sin
   conexión a WhatsApp todavía.
+- Escáner y logo (2026-11-20): pantalla `/escanear` (`src/scan`): cámara trasera con `BarcodeDetector` del navegador y, si no
+  lo tiene (iPhone, Firefox), `@zxing/browser` cargado solo en ese caso; lee Code128, QR, EAN/UPC en ~0,2 s. Busca con
+  `find_code` (SKU o código de presentación) y muestra ficha rápida: stock con estado y en cajas, precios (costo solo para
+  editores), ubicación, presentaciones, otros datos; botones entrada/salida (`/movimientos/nuevo?producto&tipo&presentacion`),
+  código desconocido → crear producto con `?sku=`. Ingreso manual (sirve con lector USB) y escaneados recientes. Botón
+  "Escanear" flotante en celular y en la barra en escritorio. Logo propio en SVG (etiqueta con código calado) y favicon.

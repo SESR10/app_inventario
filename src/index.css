@@ -41,6 +41,17 @@
 
   --font-sans: 'Plus Jakarta Sans Variable', system-ui, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
   --font-display: var(--font-sans);
+
+  /* Línea que recorre el recuadro del escáner. */
+  --animate-scanline: scanline 1.6s ease-in-out infinite alternate;
+  @keyframes scanline {
+    from {
+      top: 14%;
+    }
+    to {
+      top: 86%;
+    }
+  }
 }
 
 @layer base {
