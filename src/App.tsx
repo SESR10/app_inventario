@@ -3,11 +3,16 @@ import { lazy } from 'react'
 import { useTranslation } from 'react-i18next'
 import { BrowserRouter, Route, Routes, useParams } from 'react-router-dom'
 import { AuthProvider } from './auth/AuthProvider'
+import { NewPasswordPage } from './auth/NewPasswordPage'
 import { useAuth } from './auth/context'
 import { CompanyProvider } from './company/CompanyProvider'
 import { useCompany } from './company/context'
 import { Layout } from './components/Layout'
 import { Alert } from './components/ui/Alert'
+import { LEGAL_PATHS } from './legal/config'
+import { ConsentGate } from './legal/ConsentGate'
+import { CookieNotice } from './legal/CookieNotice'
+import { LegalPage } from './legal/LegalPage'
 import { SupabaseContext } from './lib/client-context'
 import { MovementFormPage } from './movements/MovementFormPage'
 import { MovementsPage } from './movements/MovementsPage'
@@ -77,13 +82,16 @@ function CompanyGate() {
 }
 
 function SessionGate({ client }: { client: SupabaseClient }) {
-  const { session, loading } = useAuth()
+  const { session, loading, recovering, finishRecovery, signOut } = useAuth()
   if (loading) return <Loading />
   if (!session) return <LoginPage />
+  if (recovering) return <NewPasswordPage onDone={finishRecovery} />
   return (
-    <CompanyProvider key={session.user.id} client={client} userId={session.user.id}>
-      <CompanyGate />
-    </CompanyProvider>
+    <ConsentGate key={session.user.id} client={client} onSignOut={() => void signOut()}>
+      <CompanyProvider key={session.user.id} client={client} userId={session.user.id}>
+        <CompanyGate />
+      </CompanyProvider>
+    </ConsentGate>
   )
 }
 
@@ -103,7 +111,14 @@ export default function App({ client }: { client: SupabaseClient | null }) {
     <SupabaseContext.Provider value={client}>
       <AuthProvider client={client}>
         <BrowserRouter>
-          <SessionGate client={client} />
+          {/* Documentos legales: públicos, con o sin sesión. */}
+          <Routes>
+            <Route path={LEGAL_PATHS.privacy} element={<LegalPage doc="privacy" />} />
+            <Route path={LEGAL_PATHS.terms} element={<LegalPage doc="terms" />} />
+            <Route path={LEGAL_PATHS.cookies} element={<LegalPage doc="cookies" />} />
+            <Route path="*" element={<SessionGate client={client} />} />
+          </Routes>
+          <CookieNotice />
         </BrowserRouter>
       </AuthProvider>
     </SupabaseContext.Provider>

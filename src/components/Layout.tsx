@@ -4,6 +4,7 @@ import { useTranslation } from 'react-i18next'
 import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/context'
 import { useCompany } from '../company/context'
+import { LegalLinks } from '../legal/LegalLinks'
 import { Logo } from './Logo'
 import { ScanGlyph } from './ScanGlyph'
 import { SectionIcon } from './SectionIcon'
@@ -117,6 +118,7 @@ export function Layout() {
           <Suspense fallback={<p role="status">{t('app.loading')}</p>}>
             <Outlet />
           </Suspense>
+          <LegalLinks className="mt-12" />
         </div>
       </main>
       {/* En el escáner taparía el campo del código. */}

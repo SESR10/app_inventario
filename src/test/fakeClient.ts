@@ -68,6 +68,8 @@ export function fakeClient({ signedIn = false, memberships = [], tables = {}, rp
       ),
       signUp: vi.fn(() => Promise.resolve({ data: { session: null }, error: null })),
       signOut: vi.fn(() => Promise.resolve({ error: null })),
+      resetPasswordForEmail: vi.fn(() => Promise.resolve({ data: {}, error: null })),
+      updateUser: vi.fn(() => Promise.resolve({ data: {}, error: null })),
     },
     from: vi.fn(query),
     rpc: vi.fn((name: string, args: Record<string, unknown> = {}) => {

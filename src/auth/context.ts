@@ -4,6 +4,8 @@ import { createContext, useContext } from 'react'
 export interface AuthState {
   session: Session | null
   loading: boolean
+  recovering: boolean
+  finishRecovery: () => void
   signOut: () => Promise<void>
 }
 
