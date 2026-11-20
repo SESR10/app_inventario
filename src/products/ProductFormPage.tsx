@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
-import { Link, useLocation, useNavigate, useParams } from 'react-router-dom'
+import { Link, useLocation, useNavigate, useParams, useSearchParams } from 'react-router-dom'
 import { useCompany } from '../company/context'
 import { PageHeading } from '../components/PageHeading'
 import { Alert } from '../components/ui/Alert'
@@ -99,7 +99,9 @@ export function ProductFormPage() {
   const [product, setProduct] = useState<Product | null>(null)
   const [loading, setLoading] = useState(!isNew)
   const [notFound, setNotFound] = useState(false)
-  const [form, setForm] = useState<FormState>(blank)
+  // Desde el escáner, un código que no existe llega como ?sku= para crear el producto con él.
+  const [searchParams] = useSearchParams()
+  const [form, setForm] = useState<FormState>(() => ({ ...blank, sku: isNew ? (searchParams.get('sku') ?? '') : '' }))
   const [isKit, setIsKit] = useState(false)
   const [packages, setPackages] = useState<PackageDraft[]>([])
   const [savedPackages, setSavedPackages] = useState<ProductPackage[]>([])

@@ -1,11 +1,12 @@
 import { LogOut } from 'lucide-react'
 import { Suspense, useId } from 'react'
 import { useTranslation } from 'react-i18next'
-import { NavLink, Outlet } from 'react-router-dom'
+import { Link, NavLink, Outlet, useLocation } from 'react-router-dom'
 import { useAuth } from '../auth/context'
 import { useCompany } from '../company/context'
 import { sectionImages } from '../assets/secciones'
 import { Logo } from './Logo'
+import { ScanGlyph } from './ScanGlyph'
 import { WhatsAppButton } from './WhatsAppButton'
 
 const links = [
@@ -23,6 +24,7 @@ export function Layout() {
   const { signOut } = useAuth()
   const { current, memberships, select } = useCompany()
   const companySelectId = useId()
+  const onScanPage = useLocation().pathname === '/escanear'
 
   return (
     <div className="min-h-dvh">
@@ -97,6 +99,18 @@ export function Layout() {
           </ul>
         </nav>
 
+        {/* Escanear: en el celular, botón flotante sobre el menú (al alcance del pulgar); en escritorio, en la barra. */}
+        <Link
+          to="/escanear"
+          aria-current={onScanPage ? 'page' : undefined}
+          className={`btn-solid fixed bottom-[calc(5.25rem+env(safe-area-inset-bottom))] left-1/2 z-30 inline-flex min-h-12 -translate-x-1/2 items-center gap-2 rounded-full px-5 font-bold shadow-lg shadow-black/50 transition-all duration-200 hover:brightness-110 md:static md:min-h-11 md:translate-x-0 md:rounded-xl md:px-4 md:shadow-none ${
+            onScanPage ? 'max-md:hidden md:ring-2 md:ring-white/70' : ''
+          }`}
+        >
+          <ScanGlyph />
+          {t('nav.scan')}
+        </Link>
+
         <button
           type="button"
           onClick={() => void signOut()}
@@ -107,14 +121,15 @@ export function Layout() {
         </button>
       </header>
 
-      <main id="contenido" tabIndex={-1} className="min-w-0 px-4 pt-6 pb-28 md:px-8 md:pt-8 md:pb-12 print:p-0">
+      <main id="contenido" tabIndex={-1} className="min-w-0 px-4 pt-6 pb-40 md:px-8 md:pt-8 md:pb-12 print:p-0">
         <div className="mx-auto max-w-7xl">
           <Suspense fallback={<p role="status">{t('app.loading')}</p>}>
             <Outlet />
           </Suspense>
         </div>
       </main>
-      <WhatsAppButton />
+      {/* En el escáner taparía el campo del código. */}
+      {!onScanPage && <WhatsAppButton />}
     </div>
   )
 }
