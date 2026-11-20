@@ -637,7 +637,7 @@ const es = {
       category: 'Herramientas',
       unit: 'unidad',
       location: 'Bodega principal',
-      supplier: 'Ferretería Central',
+      supplier: 'Distribuidora Central',
       package: 'Caja',
     },
     instructions: [
